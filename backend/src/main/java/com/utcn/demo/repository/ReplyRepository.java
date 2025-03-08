@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReplyRepository extends CrudRepository<Reply, String> {
-    Page<Reply> findAllByQuestion(Question question, Pageable paging);
+    Page<Reply> findAllByQuestionOrderByVoteCountDesc(Question question, Pageable paging);
 }

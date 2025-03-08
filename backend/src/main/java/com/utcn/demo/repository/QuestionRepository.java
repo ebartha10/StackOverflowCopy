@@ -12,7 +12,9 @@ import java.util.Optional;
 @Repository
 public interface QuestionRepository extends CrudRepository<Question, String> {
     Optional<Question> findById(String id);
+    Page<Question> findAll(Pageable paging);
     Page<Question> findAllByAuthor (User user, Pageable paging);
     Page<Question> findAllByTagsContainingOrderByCreatedAtDesc (String tag, Pageable paging);
     Page<Question> findAllByTitleContainingIgnoreCaseOrderByCreatedAtDesc(String title, Pageable pageable);
+    void deleteById(String id);
 }

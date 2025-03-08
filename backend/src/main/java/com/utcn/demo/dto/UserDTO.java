@@ -11,8 +11,7 @@ import lombok.Setter;
 public class UserDTO {
     private String id;
     private String email;
-    private String password;
     private String name;
-    private int score;
+    private double score;
     private boolean isAdmin;
 }

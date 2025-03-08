@@ -12,10 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionService {
@@ -39,6 +37,9 @@ public class QuestionService {
             question.setCreatedAt(new Date());
             question.setTags(questionDTO.getTags());
             question.setAuthor(optionalUser.get());
+            question.setVoteCount(0L);
+            question.setLikedBy(new HashSet<>());
+            question.setDislikedBy(new HashSet<>());
 
             Question createdQuestion = questionRepository.save(question);
 
@@ -69,17 +70,128 @@ public class QuestionService {
             Pageable paging = PageRequest.of(pageNumber, SEARCH_RESULT_PER_PAGE);
             Page<Question> questionsPage =  questionRepository.findAllByAuthor(user.get(), paging);
 
-            List<QuestionDTO> questionDTOList = new ArrayList<>();
-            for (Question question : questionsPage.getContent()) {
-                QuestionDTO questionDTO = new QuestionDTO();
-                questionDTO.setId(question.getId());
-                questionDTO.setTitle(question.getTitle());
-                questionDTO.setBody(question.getBody());
-                questionDTO.setTags(question.getTags());
-                questionDTO.setAuthorId(question.getAuthor().getId());
-                questionDTO.setVoteCount(question.getVoteCount());
-                questionDTOList.add(questionDTO);
+            return getQuestionDTOS(questionsPage);
+        }
+        return null;
+    }
+
+    private List<QuestionDTO> getQuestionDTOS(Page<Question> questionsPage) {
+        List<QuestionDTO> questionDTOList = new ArrayList<>();
+        for (Question question : questionsPage.getContent()) {
+            QuestionDTO questionDTO = new QuestionDTO();
+            questionDTO.setId(question.getId());
+            questionDTO.setTitle(question.getTitle());
+            questionDTO.setBody(question.getBody());
+            questionDTO.setTags(question.getTags());
+            questionDTO.setAuthorId(question.getAuthor().getId());
+            questionDTO.setVoteCount(question.getVoteCount());
+            questionDTOList.add(questionDTO);
+        }
+        return questionDTOList;
+    }
+
+    public List<QuestionDTO> getQuestionByTag(String tag, int pageNumber) {
+        Pageable paging = PageRequest.of(pageNumber, SEARCH_RESULT_PER_PAGE);
+        Page<Question> questionsPage =  questionRepository.findAllByTagsContainingOrderByCreatedAtDesc(tag, paging);
+
+        return getQuestionDTOS(questionsPage);
+    }
+    public List<QuestionDTO> getQuestionByTitle(String title, int pageNumber) {
+        Pageable paging = PageRequest.of(pageNumber, SEARCH_RESULT_PER_PAGE);
+        Page<Question> questionsPage =  questionRepository.findAllByTitleContainingIgnoreCaseOrderByCreatedAtDesc(title, paging);
+
+        return getQuestionDTOS(questionsPage);
+    }
+    public List<QuestionDTO> getAllQuestions(int pageNumber) {
+        Pageable paging = PageRequest.of(pageNumber, SEARCH_RESULT_PER_PAGE);
+        Page<Question> questionsPage =  questionRepository.findAll(paging);
+
+        return getQuestionDTOS(questionsPage);
+    }
+    public QuestionDTO updateQuestion(QuestionDTO questionDTO, String userId) {
+        Optional<Question> optionalQuestion = questionRepository.findById(questionDTO.getId());
+        if (optionalQuestion.isPresent()) {
+            Question question = optionalQuestion.get();
+
+            if(!question.getAuthor().getId().equals(userId)) {
+                return null;
             }
+            question.setTitle(questionDTO.getTitle());
+            question.setBody(questionDTO.getBody());
+            question.setTags(questionDTO.getTags());
+            question.setLikedBy(questionDTO.getLikedById().stream()
+                                        .map(k -> userRepository.findById(k)
+                                                .orElseThrow(() -> new RuntimeException("User not found with ID: " + k))) // Check if user is found
+                                        .collect(Collectors.toSet()));
+            question.setDislikedBy(questionDTO.getDislikedById().stream()
+                                           .map(k -> userRepository.findById(k)
+                                                   .orElseThrow(() -> new RuntimeException("User not found with ID: " + k))) // Check if user is found
+                                           .collect(Collectors.toSet()));
+            question.setVoteCount(questionDTO.getVoteCount());
+
+            Question updatedQuestion = questionRepository.save(question);
+
+            QuestionDTO updatedQuestionDTO = new QuestionDTO();
+            updatedQuestionDTO.setId(updatedQuestion.getId());
+            updatedQuestionDTO.setTitle(updatedQuestion.getTitle());
+            updatedQuestionDTO.setBody(updatedQuestion.getBody());
+            updatedQuestionDTO.setTags(updatedQuestion.getTags());
+            updatedQuestionDTO.setAuthorId(updatedQuestion.getAuthor().getId());
+            updatedQuestionDTO.setVoteCount(updatedQuestion.getVoteCount());
+            return updatedQuestionDTO;
+        }
+        return null;
+    }
+    public String deleteQuestion(String id, String userId) {
+        Optional<Question> question = questionRepository.findById(id);
+        if (question.isPresent() && !question.get().getAuthor().getId().equals(userId)) {
+            return null;
+        }
+        try {
+            questionRepository.deleteById(id);
+            return "Entry successfully deleted!";
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public String upvoteQuestion(String questionId, String userId) {
+        Optional<Question> question = questionRepository.findById(questionId);
+        Optional<User> user = userRepository.findById(userId);
+        if (question.isPresent() && user.isPresent()) {
+            Question q = question.get();
+            if (q.getLikedBy().contains(user.get())) {
+                return "Question already upvoted!";
+            }
+            q.getDislikedBy().remove(user.get());
+            q.getLikedBy().add(user.get());
+            q.setVoteCount(q.getVoteCount() + 1);
+            questionRepository.save(q);
+
+            User author = q.getAuthor();
+            author.setScore(author.getScore() + 2.5);
+            return "Question upvoted!";
+        }
+        return null;
+    }
+    public String downvoteQuestion(String questionId, String userId){
+        Optional<Question> question = questionRepository.findById(questionId);
+        Optional<User> user = userRepository.findById(userId);
+        if (question.isPresent() && user.isPresent()) {
+            Question q = question.get();
+            if (q.getDislikedBy().contains(user.get())) {
+                return "Question already downvoted!";
+            }
+            if (q.getLikedBy().contains(user.get())) {
+                q.getLikedBy().remove(user.get());
+            }
+            q.getDislikedBy().add(user.get());
+            q.setVoteCount(q.getVoteCount() - 1);
+            questionRepository.save(q);
+
+            User author = q.getAuthor();
+            author.setScore(author.getScore() - 1.5);
+            return "Question downvoted!";
         }
         return null;
     }

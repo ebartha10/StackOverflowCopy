@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface TagRepository extends CrudRepository<Tag, String> {
     Page<Tag> findAllByNameContainingIgnoreCase(String tagName, Pageable paging);
+    Page<Tag> findAll(Pageable paging);
 }

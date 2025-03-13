@@ -46,6 +46,9 @@ public class QuestionService {
             QuestionDTO createdQuestionDTO = new QuestionDTO();
             createdQuestionDTO.setId(createdQuestion.getId());
             createdQuestionDTO.setTitle(createdQuestion.getTitle());
+            createdQuestionDTO.setBody(createdQuestion.getBody());
+            createdQuestionDTO.setCreatedAt(createdQuestion.getCreatedAt());
+
             return createdQuestionDTO;
         }
         return null;
@@ -119,14 +122,33 @@ public class QuestionService {
             question.setTitle(questionDTO.getTitle());
             question.setBody(questionDTO.getBody());
             question.setTags(questionDTO.getTags());
-            question.setLikedBy(questionDTO.getLikedById().stream()
-                                        .map(k -> userRepository.findById(k)
-                                                .orElseThrow(() -> new RuntimeException("User not found with ID: " + k))) // Check if user is found
-                                        .collect(Collectors.toSet()));
-            question.setDislikedBy(questionDTO.getDislikedById().stream()
-                                           .map(k -> userRepository.findById(k)
-                                                   .orElseThrow(() -> new RuntimeException("User not found with ID: " + k))) // Check if user is found
-                                           .collect(Collectors.toSet()));
+
+            // Initialize sets if they're null
+            if (question.getLikedBy() == null) {
+                question.setLikedBy(new HashSet<>());
+            }
+            if (question.getDislikedBy() == null) {
+                question.setDislikedBy(new HashSet<>());
+            }
+
+            // Update liked users if the DTO has them
+            if (questionDTO.getLikedById() != null) {
+                Set<User> likedByUsers = questionDTO.getLikedById().stream()
+                    .map(k -> userRepository.findById(k)
+                            .orElseThrow(() -> new RuntimeException("User not found with ID: " + k)))
+                    .collect(Collectors.toSet());
+                question.setLikedBy(likedByUsers);
+            }
+
+            // Update disliked users if the DTO has them
+            if (questionDTO.getDislikedById() != null) {
+                Set<User> dislikedByUsers = questionDTO.getDislikedById().stream()
+                    .map(k -> userRepository.findById(k)
+                            .orElseThrow(() -> new RuntimeException("User not found with ID: " + k)))
+                    .collect(Collectors.toSet());
+                question.setDislikedBy(dislikedByUsers);
+            }
+
             question.setVoteCount(questionDTO.getVoteCount());
 
             Question updatedQuestion = questionRepository.save(question);
@@ -138,6 +160,24 @@ public class QuestionService {
             updatedQuestionDTO.setTags(updatedQuestion.getTags());
             updatedQuestionDTO.setAuthorId(updatedQuestion.getAuthor().getId());
             updatedQuestionDTO.setVoteCount(updatedQuestion.getVoteCount());
+            
+            // Set the liked and disliked user IDs in the response DTO
+            if (updatedQuestion.getLikedBy() != null) {
+                updatedQuestionDTO.setLikedById(
+                    updatedQuestion.getLikedBy().stream()
+                        .map(User::getId)
+                        .collect(Collectors.toSet())
+                );
+            }
+            
+            if (updatedQuestion.getDislikedBy() != null) {
+                updatedQuestionDTO.setDislikedById(
+                    updatedQuestion.getDislikedBy().stream()
+                        .map(User::getId)
+                        .collect(Collectors.toSet())
+                );
+            }
+            
             return updatedQuestionDTO;
         }
         return null;

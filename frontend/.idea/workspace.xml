@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7b9f036b-5502-41f5-b315-8c0480e5cbdf" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/com/utcn/demo/controller/QuestionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/com/utcn/demo/controller/QuestionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/com/utcn/demo/service/JwtService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/com/utcn/demo/service/JwtService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/com/utcn/demo/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/com/utcn/demo/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/.editorconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/.vscode/extensions.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/.vscode/launch.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/.vscode/tasks.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/angular.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/notes.text" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/server.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/app-routing.module.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/app.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/app.component.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/app.component.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/app.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/app.module.server.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/app.module.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-components/login/login.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-components/login/login.component.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-components/login/login.component.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-components/login/login.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-components/signup/signup.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-components/signup/signup.component.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-components/signup/signup.component.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-components/signup/signup.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-guards/noAuth-guard/no-auth.guard.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-guards/noAuth-guard/no-auth.guard.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-guards/user-gard/user.guard.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-guards/user-gard/user.guard.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-services/auth-service/auth.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-services/auth-service/auth.service.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-services/storage-service/storage.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/auth-services/storage-service/storage.service.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/dashboard/dashboard.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/dashboard/dashboard.component.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/dashboard/dashboard.component.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/dashboard/dashboard.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/get-questions-by-userid/get-questions-by-userid.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/get-questions-by-userid/get-questions-by-userid.component.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/get-questions-by-userid/get-questions-by-userid.component.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/get-questions-by-userid/get-questions-by-userid.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/post-question/post-question.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/post-question/post-question.component.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/post-question/post-question.component.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/post-question/post-question.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/view-question/view-question.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/view-question/view-question.component.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/view-question/view-question.component.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/components/view-question/view-question.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/user-routing.module.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/user-services/answer-services/answer.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/user-services/answer-services/answer.service.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/user-services/question-service/question.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/user-services/question-service/question.service.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/app/user/user.module.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/assets/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/assets/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/main.server.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/main.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/src/styles.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/tsconfig.app.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend-angular/tsconfig.spec.json" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ElmWorkspace">
+    <elmProjects />
+    <settings elmCompilerPath="C:\Users\Emeric\0.19.1\bin\elm.exe" lamderaCompilerPath="null" elmFormatPath="C:\Users\Emeric\AppData\Roaming\npm\elm-format.cmd" elmTestPath="C:\Users\Emeric\AppData\Roaming\npm\elm-test.cmd" elmReviewPath="null" isElmFormatOnSaveEnabled="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2u4kOLVbktSDdiXaqCGbW9Ve44b" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "frontend",
+    "last_opened_file_path": "X:/Facultate/An3/Sem2/PS/Assignment/StackOverflow/frontend/src",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.elm.workspace.PROJECT_DISCOVERY": "true",
+    "ts.external.directory.path": "X:\\IntelliJ IDEA 2023.2.5\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="npm.Angular CLI Server">
+    <configuration name="Angular Application" type="JavascriptDebugType" uri="http://localhost:4200">
+      <method v="2" />
+    </configuration>
+    <configuration name="Angular CLI Server" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7b9f036b-5502-41f5-b315-8c0480e5cbdf" name="Changes" comment="" />
+      <created>1741515201146</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1741515201146</updated>
+      <workItem from="1741515202151" duration="2672000" />
+      <workItem from="1741521308288" duration="36000" />
+      <workItem from="1741521371124" duration="19000" />
+      <workItem from="1741521411760" duration="211000" />
+      <workItem from="1741521699810" duration="21000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

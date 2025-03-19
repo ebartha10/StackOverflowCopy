@@ -46,7 +46,36 @@ import { Question } from '../../models/question.interface';
                     </div>
 
                     <div class="post-content">
-                        <div class="post-body">{{question.body}}</div>
+                        <!-- Question Body with Edit Mode -->
+                        @if (isEditingQuestion) {
+                            <mat-form-field appearance="outline" class="full-width">
+                                <textarea matInput
+                                         [(ngModel)]="editQuestionBody"
+                                         rows="15"></textarea>
+                            </mat-form-field>
+                            <div class="edit-actions">
+                                <button mat-stroked-button
+                                        color="primary"
+                                        (click)="saveQuestionEdit()">
+                                    Save Edits
+                                </button>
+                                <button mat-stroked-button
+                                        (click)="cancelQuestionEdit()">
+                                    Cancel
+                                </button>
+                            </div>
+                        } @else {
+                            <div class="content-with-edit">
+                                <div class="post-body">{{question.body}}</div>
+                                <button mat-stroked-button
+                                        class="edit-button"
+                                        (click)="startQuestionEdit()">
+                                    <mat-icon>edit</mat-icon>
+                                    Edit
+                                </button>
+                            </div>
+                        }
+
                         <div class="post-tags">
                             @for (tag of question.tags; track tag) {
                                 <a [routerLink]="['/tags', tag]" class="tag">{{tag}}</a>
@@ -83,7 +112,36 @@ import { Question } from '../../models/question.interface';
                             </div>
 
                             <div class="post-content">
-                                <div class="post-body">{{answer.body}}</div>
+                                <!-- Answer Body with Edit Mode -->
+                                @if (editingAnswerId === answer.id) {
+                                    <mat-form-field appearance="outline" class="full-width">
+                                        <textarea matInput
+                                                 [(ngModel)]="editAnswerBody"
+                                                 rows="10"></textarea>
+                                    </mat-form-field>
+                                    <div class="edit-actions">
+                                        <button mat-stroked-button
+                                                color="primary"
+                                                (click)="saveAnswerEdit(answer.id)">
+                                            Save Edits
+                                        </button>
+                                        <button mat-stroked-button
+                                                (click)="cancelAnswerEdit()">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                } @else {
+                                    <div class="content-with-edit">
+                                        <div class="post-body">{{answer.body}}</div>
+                                        <button mat-stroked-button
+                                                class="edit-button"
+                                                (click)="startAnswerEdit(answer)">
+                                            <mat-icon>edit</mat-icon>
+                                            Edit
+                                        </button>
+                                    </div>
+                                }
+                                
                                 <div class="post-author">
                                     <div class="author-info">
                                         answered {{answer.createdAt | date:'MMM d, y'}}
@@ -300,12 +358,107 @@ import { Question } from '../../models/question.interface';
                 }
             }
         }
+
+        .content-with-edit {
+            position: relative;
+            padding-right: 80px; // Space for edit button
+            min-height: 40px;
+        }
+
+        .edit-button {
+            position: absolute;
+            right: 0;
+            top: 0;
+            color: var(--so-link-color);
+            border-color: var(--so-link-color);
+            font-size: 13px;
+            height: 32px;
+            padding: 0 12px;
+
+            mat-icon {
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
+                margin-right: 4px;
+            }
+
+            &:hover {
+                background-color: rgba(0,149,255,0.1);
+            }
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 8px;
+            margin: 8px 0;
+            justify-content: flex-end;
+
+            button {
+                font-size: 13px;
+                height: 35px;
+
+                &:first-child {
+                    color: var(--so-link-hover);
+                    border-color: var(--so-link-hover);
+
+                    &:hover {
+                        background-color: rgba(0,149,255,0.1);
+                    }
+                }
+
+                &:last-child {
+                    color: var(--so-gray);
+                    border-color: var(--so-border-color);
+
+                    &:hover {
+                        background-color: var(--so-gray-light);
+                        color: var(--so-black);
+                    }
+                }
+            }
+        }
+
+        .full-width {
+            width: 100%;
+
+            ::ng-deep {
+                textarea {
+                    font-family: inherit;
+                    font-size: 15px;
+                    line-height: 1.5;
+                    color: var(--so-black) !important;
+                    background-color: white;
+                }
+
+                .mat-mdc-form-field-flex {
+                    background-color: white;
+                }
+
+                .mat-mdc-text-field-wrapper {
+                    background-color: white;
+                }
+
+                .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-text-field__input {
+                    color: var(--so-black) !important;
+                }
+
+                .mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__input {
+                    color: var(--so-black) !important;
+                }
+            }
+        }
     `]
 })
 export class QuestionThreadComponent implements OnInit {
     question: Question | undefined;
-    answers: any[] = []; // Replace with proper Answer interface
+    answers: any[] = [];
     newAnswer: string = '';
+    
+    // Edit mode states
+    isEditingQuestion: boolean = false;
+    editingAnswerId: number | null = null;
+    editQuestionBody: string = '';
+    editAnswerBody: string = '';
 
     constructor(
         private route: ActivatedRoute,
@@ -331,6 +484,45 @@ export class QuestionThreadComponent implements OnInit {
                 }
             ];
         });
+    }
+
+    // Question edit methods
+    startQuestionEdit() {
+        this.isEditingQuestion = true;
+        this.editQuestionBody = this.question?.body || '';
+    }
+
+    saveQuestionEdit() {
+        if (this.question && this.editQuestionBody.trim()) {
+            this.question.body = this.editQuestionBody;
+            // TODO: Implement actual save to backend
+            this.isEditingQuestion = false;
+        }
+    }
+
+    cancelQuestionEdit() {
+        this.isEditingQuestion = false;
+        this.editQuestionBody = '';
+    }
+
+    // Answer edit methods
+    startAnswerEdit(answer: any) {
+        this.editingAnswerId = answer.id;
+        this.editAnswerBody = answer.body;
+    }
+
+    saveAnswerEdit(answerId: number) {
+        const answer = this.answers.find(a => a.id === answerId);
+        if (answer && this.editAnswerBody.trim()) {
+            answer.body = this.editAnswerBody;
+            // TODO: Implement actual save to backend
+            this.editingAnswerId = null;
+        }
+    }
+
+    cancelAnswerEdit() {
+        this.editingAnswerId = null;
+        this.editAnswerBody = '';
     }
 
     submitAnswer() {

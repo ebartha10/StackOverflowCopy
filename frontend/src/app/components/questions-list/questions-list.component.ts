@@ -11,6 +11,7 @@ import { Question } from '../../models/question.interface';
 import { QuestionService } from '../../services/question.service';
 
 @Component({
+    
     selector: 'app-questions-list',
     standalone: true,
     imports: [

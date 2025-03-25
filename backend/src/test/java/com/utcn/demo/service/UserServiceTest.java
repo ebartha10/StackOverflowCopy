@@ -24,7 +24,6 @@ public class UserServiceTest {
 
     @Test
     public void testGetUserById_existingUser_returnsUserDTO() {
-        // Arrange
         User user = new User();
         user.setId("123");
         user.setEmail("test@example.com");
@@ -34,10 +33,8 @@ public class UserServiceTest {
 
         Mockito.when(userRepository.findById("123")).thenReturn(Optional.of(user));
 
-        // Act
         UserDTO result = userService.getUserById("123");
 
-        // Assert
         assertNotNull(result);
         assertEquals("123", result.getId());
         assertEquals("test@example.com", result.getEmail());
@@ -48,19 +45,15 @@ public class UserServiceTest {
 
     @Test
     public void testGetUserById_nonExistingUser_returnsNull() {
-        // Arrange
         Mockito.when(userRepository.findById("999")).thenReturn(Optional.empty());
 
-        // Act
         UserDTO result = userService.getUserById("999");
 
-        // Assert
         assertNull(result);
     }
 
     @Test
     public void testGetUserByEmail_existingUser_returnsUserDTO() {
-        // Arrange
         User user = new User();
         user.setId("abc");
         user.setEmail("bogdan@example.com");
@@ -70,10 +63,8 @@ public class UserServiceTest {
 
         Mockito.when(userRepository.findFirstByEmail("bogdan@example.com")).thenReturn(Optional.of(user));
 
-        // Act
         UserDTO result = userService.getUserByEmail("bogdan@example.com");
 
-        // Assert
         assertNotNull(result);
         assertEquals("abc", result.getId());
         assertEquals("bogdan@example.com", result.getEmail());
@@ -84,19 +75,15 @@ public class UserServiceTest {
 
     @Test
     public void testGetUserByEmail_nonExistingUser_returnsNull() {
-        // Arrange
         Mockito.when(userRepository.findFirstByEmail("notfound@example.com")).thenReturn(Optional.empty());
 
-        // Act
         UserDTO result = userService.getUserByEmail("notfound@example.com");
 
-        // Assert
         assertNull(result);
     }
 
     @Test
     public void testUpdateUser_existingUser_updatesAndReturnsDTO() {
-        // Arrange
         User existingUser = new User();
         existingUser.setId("321");
         existingUser.setEmail("update@example.com");
@@ -116,10 +103,8 @@ public class UserServiceTest {
         Mockito.when(userRepository.findById("321")).thenReturn(Optional.of(existingUser));
         Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(updatedUser);
 
-        // Act
         UserDTO result = userService.updateUser(inputDTO);
 
-        // Assert
         assertNotNull(result);
         assertEquals("321", result.getId());
         assertEquals("update@example.com", result.getEmail());
@@ -130,39 +115,30 @@ public class UserServiceTest {
 
     @Test
     public void testUpdateUser_nonExistingUser_returnsNull() {
-        // Arrange
         UserDTO inputDTO = new UserDTO("999", "ghost@example.com", "Ghost", 0.0, false);
 
         Mockito.when(userRepository.findById("999")).thenReturn(Optional.empty());
 
-        // Act
         UserDTO result = userService.updateUser(inputDTO);
 
-        // Assert
         assertNull(result);
     }
 
     @Test
     public void testDeleteUser_successfulDeletion_returnsSuccessMessage() {
-        // Arrange – nu avem nevoie de setup special aici
         Mockito.doNothing().when(userRepository).deleteById("123");
 
-        // Act
         String result = userService.deleteUser("123");
 
-        // Assert
         assertEquals("User successfully deleted!", result);
     }
 
     @Test
     public void testDeleteUser_exceptionThrown_returnsNull() {
-        // Arrange – simulăm o excepție
         Mockito.doThrow(new RuntimeException()).when(userRepository).deleteById("999");
 
-        // Act
         String result = userService.deleteUser("999");
 
-        // Assert
         assertNull(result);
     }
 

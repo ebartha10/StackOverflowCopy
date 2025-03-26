@@ -18,4 +18,5 @@ public class User {
     private String name;
     private double score;
     private boolean isAdmin;
+    private boolean isBanned;
 }

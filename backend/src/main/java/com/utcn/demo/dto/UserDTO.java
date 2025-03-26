@@ -14,4 +14,5 @@ public class UserDTO {
     private String name;
     private double score;
     private boolean isAdmin;
+    private boolean isBanned;
 }

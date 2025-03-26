@@ -3,6 +3,7 @@ package com.utcn.demo.service;
 import com.utcn.demo.dto.QuestionDTO;
 import com.utcn.demo.entity.Question;
 import com.utcn.demo.entity.User;
+import com.utcn.demo.exception.UserBannedException;
 import com.utcn.demo.repository.QuestionRepository;
 import com.utcn.demo.repository.ReplyRepository;
 import com.utcn.demo.repository.UserRepository;
@@ -31,12 +32,17 @@ public class QuestionService {
     public QuestionDTO createQuestion(QuestionDTO questionDTO) {
         Optional<User> optionalUser = userRepository.findById(questionDTO.getAuthorId());
         if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (user.isBanned()) {
+                throw new UserBannedException("Your account has been banned. You cannot create questions.");
+            }
+
             Question question = new Question();
             question.setTitle(questionDTO.getTitle());
             question.setBody(questionDTO.getBody());
             question.setCreatedAt(new Date());
             question.setTags(questionDTO.getTags());
-            question.setAuthor(optionalUser.get());
+            question.setAuthor(user);
             question.setVoteCount(0L);
             question.setLikedBy(new HashSet<>());
             question.setDislikedBy(new HashSet<>());
@@ -115,10 +121,16 @@ public class QuestionService {
         Optional<Question> optionalQuestion = questionRepository.findById(questionDTO.getId());
         if (optionalQuestion.isPresent()) {
             Question question = optionalQuestion.get();
+            User user = question.getAuthor();
 
-            if(!question.getAuthor().getId().equals(userId)) {
+            if (!user.getId().equals(userId)) {
                 return null;
             }
+
+            if (user.isBanned()) {
+                throw new UserBannedException("Your account has been banned. You cannot update questions.");
+            }
+
             question.setTitle(questionDTO.getTitle());
             question.setBody(questionDTO.getBody());
             question.setTags(questionDTO.getTags());
@@ -184,27 +196,39 @@ public class QuestionService {
     }
     public String deleteQuestion(String id, String userId) {
         Optional<Question> question = questionRepository.findById(id);
-        if (question.isPresent() && !question.get().getAuthor().getId().equals(userId)) {
-            return null;
+        if (question.isPresent()) {
+            User user = question.get().getAuthor();
+            if (!user.getId().equals(userId)) {
+                return null;
+            }
+            if (user.isBanned()) {
+                throw new UserBannedException("Your account has been banned. You cannot delete questions.");
+            }
+            try {
+                questionRepository.deleteById(id);
+                return "Entry successfully deleted!";
+            } catch (Exception e) {
+                return null;
+            }
         }
-        try {
-            questionRepository.deleteById(id);
-            return "Entry successfully deleted!";
-        } catch (Exception e) {
-            return null;
-        }
+        return null;
     }
 
     public String upvoteQuestion(String questionId, String userId) {
         Optional<Question> question = questionRepository.findById(questionId);
         Optional<User> user = userRepository.findById(userId);
         if (question.isPresent() && user.isPresent()) {
+            User votingUser = user.get();
+            if (votingUser.isBanned()) {
+                throw new UserBannedException("Your account has been banned. You cannot vote on questions.");
+            }
+
             Question q = question.get();
-            if (q.getLikedBy().contains(user.get())) {
+            if (q.getLikedBy().contains(votingUser)) {
                 return "Question already upvoted!";
             }
-            q.getDislikedBy().remove(user.get());
-            q.getLikedBy().add(user.get());
+            q.getDislikedBy().remove(votingUser);
+            q.getLikedBy().add(votingUser);
             q.setVoteCount(q.getVoteCount() + 1);
             questionRepository.save(q);
 
@@ -218,14 +242,19 @@ public class QuestionService {
         Optional<Question> question = questionRepository.findById(questionId);
         Optional<User> user = userRepository.findById(userId);
         if (question.isPresent() && user.isPresent()) {
+            User votingUser = user.get();
+            if (votingUser.isBanned()) {
+                throw new UserBannedException("Your account has been banned. You cannot vote on questions.");
+            }
+
             Question q = question.get();
-            if (q.getDislikedBy().contains(user.get())) {
+            if (q.getDislikedBy().contains(votingUser)) {
                 return "Question already downvoted!";
             }
-            if (q.getLikedBy().contains(user.get())) {
-                q.getLikedBy().remove(user.get());
+            if (q.getLikedBy().contains(votingUser)) {
+                q.getLikedBy().remove(votingUser);
             }
-            q.getDislikedBy().add(user.get());
+            q.getDislikedBy().add(votingUser);
             q.setVoteCount(q.getVoteCount() - 1);
             questionRepository.save(q);
 

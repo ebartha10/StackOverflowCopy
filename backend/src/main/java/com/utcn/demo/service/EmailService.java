@@ -40,12 +40,13 @@ public class EmailService {
 
             email.addPersonalization("name", userName);
             email.addPersonalization("duration", "indefinite");
-            email.addPersonalization("startDate", LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
-            email.addPersonalization("isAppealable", "false");
+            email.addPersonalization("start_date", LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+            email.addPersonalization("appealable", "false");
 
             mailerSend.emails().send(email);
         } catch (Exception e) {
             System.err.println("Failed to send ban notification email: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

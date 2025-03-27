@@ -54,7 +54,7 @@ public class QuestionService {
             createdQuestionDTO.setTitle(createdQuestion.getTitle());
             createdQuestionDTO.setBody(createdQuestion.getBody());
             createdQuestionDTO.setCreatedAt(createdQuestion.getCreatedAt());
-
+            createdQuestionDTO.setAuthorId(user.getId());
             return createdQuestionDTO;
         }
         return null;

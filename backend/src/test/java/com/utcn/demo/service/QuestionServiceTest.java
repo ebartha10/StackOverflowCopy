@@ -165,4 +165,151 @@ public class QuestionServiceTest {
         assertEquals(1, result.size());
         assertEquals("qTitle", result.get(0).getId());
     }
+
+    @Test
+    public void testCreateQuestion_validUser_createsQuestion() {
+        User author = new User();
+        author.setId("user123");
+        author.setBanned(false);
+
+        QuestionDTO inputDTO = new QuestionDTO();
+        inputDTO.setTitle("New Question");
+        inputDTO.setBody("Question body");
+        inputDTO.setTags(List.of("java"));
+        inputDTO.setAuthorId("user123");
+
+        Question savedQuestion = new Question();
+        savedQuestion.setId("q123");
+        savedQuestion.setTitle("New Question");
+        savedQuestion.setBody("Question body");
+        savedQuestion.setTags(List.of("java"));
+        savedQuestion.setAuthor(author);
+        savedQuestion.setVoteCount(0L);
+
+        Mockito.when(userRepository.findById("user123")).thenReturn(Optional.of(author));
+        Mockito.when(questionRepository.save(Mockito.any(Question.class))).thenReturn(savedQuestion);
+
+        QuestionDTO result = questionService.createQuestion(inputDTO);
+
+        assertNotNull(result);
+        assertEquals("q123", result.getId());
+        assertEquals("New Question", result.getTitle());
+        assertEquals("Question body", result.getBody());
+        assertEquals("user123", result.getAuthorId());
+    }
+
+    @Test
+    public void testUpdateQuestion_validUser_updatesQuestion() {
+        User author = new User();
+        author.setId("user123");
+        author.setBanned(false);
+
+        Question existingQuestion = new Question();
+        existingQuestion.setId("q123");
+        existingQuestion.setTitle("Old Title");
+        existingQuestion.setBody("Old Body");
+        existingQuestion.setAuthor(author);
+        existingQuestion.setVoteCount(0L);
+        existingQuestion.setLikedBy(new HashSet<>());
+        existingQuestion.setDislikedBy(new HashSet<>());
+
+        QuestionDTO inputDTO = new QuestionDTO();
+        inputDTO.setId("q123");
+        inputDTO.setTitle("New Title");
+        inputDTO.setBody("New Body");
+        inputDTO.setTags(List.of("java"));
+
+        Question updatedQuestion = new Question();
+        updatedQuestion.setId("q123");
+        updatedQuestion.setTitle("New Title");
+        updatedQuestion.setBody("New Body");
+        updatedQuestion.setAuthor(author);
+        updatedQuestion.setVoteCount(0L);
+
+        Mockito.when(questionRepository.findById("q123")).thenReturn(Optional.of(existingQuestion));
+        Mockito.when(questionRepository.save(Mockito.any(Question.class))).thenReturn(updatedQuestion);
+
+        QuestionDTO result = questionService.updateQuestion(inputDTO, "user123");
+
+        assertNotNull(result);
+        assertEquals("q123", result.getId());
+        assertEquals("New Title", result.getTitle());
+        assertEquals("New Body", result.getBody());
+    }
+
+    @Test
+    public void testDeleteQuestion_validUser_deletesQuestion() {
+        User author = new User();
+        author.setId("user123");
+        author.setBanned(false);
+
+        Question question = new Question();
+        question.setId("q123");
+        question.setAuthor(author);
+
+        Mockito.when(questionRepository.findById("q123")).thenReturn(Optional.of(question));
+        Mockito.doNothing().when(questionRepository).deleteById("q123");
+
+        String result = questionService.deleteQuestion("q123", "user123");
+
+        assertEquals("Entry successfully deleted!", result);
+    }
+
+    @Test
+    public void testUpvoteQuestion_validUser_upvotesQuestion() {
+        User votingUser = new User();
+        votingUser.setId("voter123");
+        votingUser.setBanned(false);
+
+        User author = new User();
+        author.setId("author123");
+        author.setScore(0.0);
+
+        Question question = new Question();
+        question.setId("q123");
+        question.setAuthor(author);
+        question.setVoteCount(0L);
+        question.setLikedBy(new HashSet<>());
+        question.setDislikedBy(new HashSet<>());
+
+        Mockito.when(questionRepository.findById("q123")).thenReturn(Optional.of(question));
+        Mockito.when(userRepository.findById("voter123")).thenReturn(Optional.of(votingUser));
+        Mockito.when(questionRepository.save(Mockito.any(Question.class))).thenReturn(question);
+        Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(author);
+
+        String result = questionService.upvoteQuestion("q123", "voter123");
+
+        assertEquals("Question upvoted!", result);
+        assertEquals(1L, question.getVoteCount());
+        assertEquals(2.5, author.getScore());
+    }
+
+    @Test
+    public void testDownvoteQuestion_validUser_downvotesQuestion() {
+        User votingUser = new User();
+        votingUser.setId("voter123");
+        votingUser.setBanned(false);
+
+        User author = new User();
+        author.setId("author123");
+        author.setScore(10.0);
+
+        Question question = new Question();
+        question.setId("q123");
+        question.setAuthor(author);
+        question.setVoteCount(5L);
+        question.setLikedBy(new HashSet<>());
+        question.setDislikedBy(new HashSet<>());
+
+        Mockito.when(questionRepository.findById("q123")).thenReturn(Optional.of(question));
+        Mockito.when(userRepository.findById("voter123")).thenReturn(Optional.of(votingUser));
+        Mockito.when(questionRepository.save(Mockito.any(Question.class))).thenReturn(question);
+        Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(author);
+
+        String result = questionService.downvoteQuestion("q123", "voter123");
+
+        assertEquals("Question downvoted!", result);
+        assertEquals(4L, question.getVoteCount());
+        assertEquals(8.5, author.getScore());
+    }
 }

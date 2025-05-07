@@ -1,0 +1,97 @@
+<div class="questions-container">
+    <div class="questions-header">
+        <div class="header-content">
+            <div class="title-section">
+                <h1>All Questions</h1>
+                <p class="text-so-gray">{{questions.length}} questions</p>
+            </div>
+            <div class="header-actions">
+                <button mat-stroked-button
+                        [matMenuTriggerFor]="filterMenu"
+                        class="filter-button">
+                    <mat-icon>filter_list</mat-icon>
+                    Filter by tags
+                </button>
+                <button mat-flat-button
+                        color="primary"
+                        class="ask-button"
+                        routerLink="/questions/ask">
+                    <mat-icon>add</mat-icon>
+                    Ask Question
+                </button>
+
+                <!-- Filter Menu -->
+                <mat-menu #filterMenu="matMenu" class="filter-menu">
+                    <div class="menu-content" (click)="$event.stopPropagation()">
+                        <div class="search-tags">
+                            <mat-form-field appearance="outline" class="compact-form-field">
+                                <input matInput
+                                       [(ngModel)]="tagSearch"
+                                       (ngModelChange)="filterTags()"
+                                       placeholder="Search tags">
+                                <mat-icon matSuffix class="search-icon">search</mat-icon>
+                            </mat-form-field>
+                        </div>
+                        <div class="tags-list">
+                            @for (tag of filteredTags; track tag) {
+                                <div class="tag-item"
+                                     [class.selected]="selectedTags.includes(tag)"
+                                     (click)="toggleTag(tag)">
+                                    <span class="tag">{{tag}}</span>
+                                    <mat-icon *ngIf="selectedTags.includes(tag)" class="check-icon">check</mat-icon>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+
+    <div class="questions-list">
+        @for (question of questions; track question.id) {
+            <div class="question-item">
+                <div class="question-summary">
+                    <h3>
+                        <a [routerLink]="['/questions', question.id]">{{question.title}}</a>
+                    </h3>
+                    <div class="excerpt">{{question.body}}</div>
+                    <div class="flex justify-between items-end">
+                        <div class="tags">
+                            @for (tag of question.tags; track tag) {
+                                <a [routerLink]="['/tags', tag]" class="tag">{{tag}}</a>
+                            }
+                        </div>
+                        <div class="meta">
+                            asked {{question.createdAt | date:'MMM d, y'}} by
+                            <a [routerLink]="['/users', question.author.id]">
+                                {{question.author.username}}
+                            </a>
+                            <span class="reputation">{{question.author.reputation | number}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-content">
+                            <mat-icon class="stat-icon">arrow_upward</mat-icon>
+                            <span class="font-bold">{{question.votes}}</span>
+                        </div>
+                    </div>
+                    <div class="stat-item" [class.answered]="question.answers > 0">
+                        <div class="stat-content">
+                            <mat-icon class="stat-icon">question_answer</mat-icon>
+                            <span class="font-bold">{{question.answers}}</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-content">
+                            <mat-icon class="stat-icon">visibility</mat-icon>
+                            <span class="font-bold">{{question.views}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

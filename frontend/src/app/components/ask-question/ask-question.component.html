@@ -1,0 +1,101 @@
+<div class="ask-question-container">
+    <div class="page-header">
+        <h1>Ask a public question</h1>
+    </div>
+
+    <!-- Writing Tips -->
+    <div class="writing-tips">
+        <h2>Writing a good question</h2>
+        <div class="tips-content">
+            <p>Steps to write a good question:</p>
+            <ul>
+                <li>Summarize your problem in a one-line title</li>
+                <li>Describe your problem in more detail</li>
+                <li>Describe what you tried and what you expected to happen</li>
+                <li>Add "tags" which help surface your question to members of the community</li>
+                <li>Review your question and post it to the site</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Question Form -->
+    <form class="question-form" (ngSubmit)="onSubmit()">
+        <!-- Title -->
+        <div class="form-section">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Title</mat-label>
+                <input matInput 
+                       [(ngModel)]="questionTitle" 
+                       name="title"
+                       placeholder="e.g. How to center a div in CSS?"
+                       required>
+                <mat-hint>Be specific and imagine you're asking a question to another person.</mat-hint>
+            </mat-form-field>
+        </div>
+
+        <!-- Body -->
+        <div class="form-section">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Body</mat-label>
+                <textarea matInput
+                          [(ngModel)]="questionBody"
+                          name="body"
+                          rows="15"
+                          placeholder="Include all the information someone would need to answer your question"
+                          required></textarea>
+                <mat-hint>Include all the details someone would need to answer your question.</mat-hint>
+            </mat-form-field>
+        </div>
+
+        <!-- Tags -->
+        <div class="form-section">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Tags</mat-label>
+                <mat-chip-grid #chipGrid aria-label="Tag selection">
+                    @for (tag of selectedTags; track tag) {
+                        <mat-chip-row
+                            (removed)="removeTag(tag)">
+                            {{tag}}
+                            <button matChipRemove>
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                        </mat-chip-row>
+                    }
+                </mat-chip-grid>
+                <input placeholder="e.g. (angular typescript css)"
+                       [matChipInputFor]="chipGrid"
+                       [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                       [matChipInputAddOnBlur]="true"
+                       [(ngModel)]="tagSearch"
+                       (ngModelChange)="filterTags()"
+                       name="tagInput">
+                <mat-hint>Add up to 5 tags to describe what your question is about.</mat-hint>
+            </mat-form-field>
+            
+            <!-- Filtered Tags List -->
+            @if (tagSearch && filteredTags.length > 0) {
+                <div class="filtered-tags">
+                    @for (tag of filteredTags; track tag) {
+                        <div class="tag-item" 
+                             [class.selected]="selectedTags.includes(tag)"
+                             (click)="toggleTag(tag)">
+                            <span class="tag-name">{{tag}}</span>
+                            <mat-icon *ngIf="selectedTags.includes(tag)" class="check-icon">check</mat-icon>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+            <button mat-flat-button 
+                    color="primary" 
+                    type="submit" 
+                    class="submit-button"
+                    [disabled]="!isFormValid()">
+                Post your question
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,56 @@
+<nav class="so-nav">
+    <div class="container">
+        <div class="nav-content">
+            <!-- Logo -->
+            <a class="flex-none" routerLink="/">
+                <img src="https://stackoverflow.design/assets/img/logos/so/logo-stackoverflow.svg"
+                     alt="Stack Overflow"
+                     class="nav-logo" />
+            </a>
+
+            <!-- Search -->
+            <div class="nav-search">
+                <div class="search-wrapper">
+                    <mat-icon class="search-icon">search</mat-icon>
+                    <input type="text" placeholder="Search..." class="search-input"/>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="nav-actions">
+                <button type="button" mat-icon-button [matMenuTriggerFor]="authMenu" class="auth-button">
+                    <mat-icon class="centered-icon">person</mat-icon>
+                </button>
+
+                <!-- Auth Menu -->
+                <mat-menu #authMenu="matMenu" xPosition="before" class="auth-menu">
+                    <!-- Show these items when user is logged in -->
+                    <div class="menu-content">
+                        <ng-container *ngIf="isLoggedIn">
+                            <a mat-menu-item routerLink="/profile">
+                                <mat-icon>account_circle</mat-icon>
+                                <span>Profile</span>
+                            </a>
+                            <button mat-menu-item (click)="onLogout()">
+                                <mat-icon>logout</mat-icon>
+                                <span>Log out</span>
+                            </button>
+                        </ng-container>
+
+                        <!-- Show these items when user is not logged in -->
+                        <ng-container *ngIf="!isLoggedIn">
+                            <a mat-menu-item routerLink="/auth">
+                                <mat-icon>login</mat-icon>
+                                <span>Sign in</span>
+                            </a>
+                            <a mat-menu-item routerLink="/auth" [queryParams]="{signup: true}">
+                                <mat-icon>person_add</mat-icon>
+                                <span>Sign up</span>
+                            </a>
+                        </ng-container>
+                    </div>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+</nav>

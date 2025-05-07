@@ -1,0 +1,276 @@
+.thread-container {
+    max-width: 1100px;
+    margin: 24px auto;
+    padding: 24px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: var(--so-box-shadow);
+}
+
+.question-header {
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--so-border-color);
+
+    h1 {
+        font-family: var(--so-title-font);
+        font-size: 27px;
+        margin-bottom: 8px;
+        color: var(--so-black);
+    }
+
+    .question-meta {
+        display: flex;
+        gap: 16px;
+        color: var(--so-gray);
+        font-size: 13px;
+
+        span {
+            color: var(--so-gray-dark);
+        }
+    }
+}
+
+.post-layout {
+    display: flex;
+    gap: 16px;
+    padding: 16px 0;
+}
+
+.vote-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 36px;
+    color: var(--so-black);
+
+    .vote-count {
+        font-size: 21px;
+        margin: 8px 0;
+    }
+
+    .mat-icon-button {
+        width: 36px;
+        height: 36px;
+        line-height: 36px;
+
+        mat-icon {
+            color: var(--so-black);
+        }
+
+        &:hover {
+            background-color: var(--so-gray-light);
+        }
+    }
+}
+
+.post-content {
+    flex: 1;
+
+    .post-body {
+        font-size: 15px;
+        line-height: 1.5;
+        margin-bottom: 16px;
+    }
+}
+
+.post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 16px;
+
+    .tag {
+        background-color: #e1ecf4;
+        color: var(--so-link-color);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        text-decoration: none;
+        border: 1px solid #d1e5f1;
+
+        &:hover {
+            background-color: #d0e3f1;
+            color: var(--so-link-hover);
+        }
+    }
+}
+
+.post-author {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 16px;
+    margin-top: 16px;
+    border-top: 1px solid var(--so-border-color);
+
+    .author-info {
+        color: var(--so-gray);
+        font-size: 12px;
+
+        a {
+            color: var(--so-link-color);
+            text-decoration: none;
+            margin: 0 4px;
+
+            &:hover {
+                color: var(--so-link-hover);
+            }
+        }
+
+        .reputation {
+            display: inline;
+            color: var(--so-gray-dark);
+            font-weight: 500;
+        }
+    }
+}
+
+.answers-section {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--so-border-color);
+
+    h2 {
+        font-family: var(--so-title-font);
+        font-size: 19px;
+        margin-bottom: 16px;
+        color: var(--so-black);
+    }
+}
+
+.answer-item {
+    border-bottom: 1px solid var(--so-border-color);
+    background-color: #f8f9f9;
+    border-radius: 10px;
+    border: 3px solid var(--so-gray-light);
+    margin-bottom: 16px;
+    padding: 16px;
+
+}
+
+.answer-form {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--so-border-color);
+
+    h2 {
+        font-family: var(--so-title-font);
+        font-size: 19px;
+        margin-bottom: 16px;
+        color: var(--so-black);
+        
+    }
+
+    .full-width {
+        width: 100%;
+        margin-bottom: 16px;
+
+    }
+
+    textarea {
+        font-family: inherit;
+        font-size: 15px;
+        line-height: 1.5;
+        color: var(--so-black);
+    }
+
+    button {
+        background-color: var(--so-link-hover);
+        color: white;
+        padding: 10px 16px;
+        font-weight: 500;
+
+        &:hover {
+            background-color: var(--so-link-color);
+        }
+    }
+}
+
+.content-with-edit {
+    position: relative;
+    padding-right: 80px; // Space for edit button
+    min-height: 40px;
+}
+
+.edit-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: var(--so-link-color);
+    border-color: var(--so-link-color);
+    font-size: 13px;
+    height: 32px;
+    padding: 0 12px;
+
+    mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        margin-right: 4px;
+    }
+
+    &:hover {
+        background-color: rgba(0,149,255,0.1);
+    }
+}
+
+.edit-actions {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0;
+    justify-content: flex-end;
+
+    button {
+        font-size: 13px;
+        height: 35px;
+
+        &:first-child {
+            color: var(--so-link-hover);
+            border-color: var(--so-link-hover);
+
+            &:hover {
+                background-color: rgba(0,149,255,0.1);
+            }
+        }
+
+        &:last-child {
+            color: var(--so-gray);
+            border-color: var(--so-border-color);
+
+            &:hover {
+                background-color: var(--so-gray-light);
+                color: var(--so-black);
+            }
+        }
+    }
+}
+
+.full-width {
+    width: 100%;
+
+    ::ng-deep {
+        textarea {
+            font-family: inherit;
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--so-black) !important;
+            background-color: white;
+        }
+
+        .mat-mdc-form-field-flex {
+            background-color: white;
+        }
+
+        .mat-mdc-text-field-wrapper {
+            background-color: white;
+        }
+
+        .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-text-field__input {
+            color: var(--so-black) !important;
+        }
+
+        .mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__input {
+            color: var(--so-black) !important;
+        }
+    }
+}

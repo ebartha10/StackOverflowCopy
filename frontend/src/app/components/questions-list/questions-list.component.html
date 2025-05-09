@@ -49,7 +49,7 @@
     </div>
 
     <div class="questions-list">
-        @for (question of questions; track question.id) {
+        @for (question of filteredQuestions; track question.id) {
             <div class="question-item">
                 <div class="question-summary">
                     <h3>

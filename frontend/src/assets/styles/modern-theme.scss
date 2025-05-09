@@ -1,0 +1,143 @@
+// Modern Theme Variables
+:root {
+    // Colors - Modern Fresh Palette
+    --primary: #4f46e5; // Modern indigo
+    --secondary: #64748b; // Slate
+    --accent: #f97316; // Vibrant orange
+    --background: #f8fafc; // Very light blue-gray
+    --text: #1e293b; // Slate dark
+    --text-light: #94a3b8; // Slate light
+    --white: #ffffff;
+    --black: #0f172a;
+    
+    // Modern Gray Scale
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+
+    // Accent Colors
+    --success: #10b981; // Emerald
+    --warning: #f59e0b; // Amber
+    --error: #ef4444; // Red
+    --info: #3b82f6; // Blue
+
+    // Metallic Colors - More subtle and modern
+    --metallic-gold: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+    --metallic-silver: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+    --metallic-bronze: linear-gradient(135deg, #fb923c 0%, #c2410c 100%);
+
+    // Glass Effect - More modern and subtle
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.1), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+
+    // Shadows - Softer and more natural
+    --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -4px rgba(15, 23, 42, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+
+    // Typography - Modern system fonts
+    --font-family-base: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-family-heading: 'Inter', var(--font-family-base);
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 600;
+
+    // Spacing - Keep existing values
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+
+    // Border Radius - Slightly more modern
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-full: 9999px;
+
+    // Transitions - Smoother
+    --transition-normal: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slower: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+    // Container
+    --container-max-width: 1280px;
+}
+
+// Card Styles - More modern glass effect
+.card-metallic {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8));
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+// Button Styles - More subtle neumorphic effect
+.btn-neu {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    box-shadow: -2px -2px 5px rgba(255, 255, 255, 0.8),
+                3px 3px 5px rgba(15, 23, 42, 0.1);
+    transition: all var(--transition-normal);
+    color: var(--text);
+
+    &:hover {
+        background: var(--gray-100);
+        box-shadow: -1px -1px 3px rgba(255, 255, 255, 0.8),
+                    2px 2px 4px rgba(15, 23, 42, 0.1);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        background: var(--gray-100);
+        box-shadow: inset -1px -1px 3px rgba(255, 255, 255, 0.8),
+                    inset 2px 2px 4px rgba(15, 23, 42, 0.1);
+        transform: translateY(0);
+    }
+}
+
+// Animations - Smoother shimmer effect
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.animate-shimmer {
+    animation: shimmer 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(
+        to right,
+        var(--gray-100) 4%,
+        var(--gray-200) 25%,
+        var(--gray-100) 36%
+    );
+    background-size: 1000px 100%;
+} 

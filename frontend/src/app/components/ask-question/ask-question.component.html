@@ -68,6 +68,7 @@
                        [matChipInputAddOnBlur]="true"
                        [(ngModel)]="tagSearch"
                        (ngModelChange)="filterTags()"
+                       (keydown.enter)="onTagInputKeyPress($event)"
                        name="tagInput">
                 <mat-hint>Add up to 5 tags to describe what your question is about.</mat-hint>
             </mat-form-field>

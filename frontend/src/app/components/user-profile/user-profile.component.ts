@@ -134,10 +134,11 @@ export class UserProfileComponent implements OnInit {
     }
 
     toggleBanStatus() {
-        if (this.user.isBanned) {
+        if (this.user.banned) {
             this.userService.unbanUser(this.user.id).subscribe({
                 next: (response) => {
-                    this.user.isBanned = false;
+                    this.user.banned = false;
+                    this.loadUserData(this.user.id);
                 },
                 error: (error) => {
                     console.error('Error unbanning user:', error);
@@ -146,7 +147,8 @@ export class UserProfileComponent implements OnInit {
         } else {
             this.userService.banUser(this.user.id).subscribe({
                 next: (response) => {
-                    this.user.isBanned = true;
+                    this.user.banned = true;
+                    this.loadUserData(this.user.id);
                 },
                 error: (error) => {
                     console.error('Error banning user:', error);

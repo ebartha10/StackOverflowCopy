@@ -196,8 +196,13 @@ public class UserService {
         userRepository.save(user);
 
         // Send ban notification email
-        emailService.sendBanNotification(user.getEmail(), user.getName());
-
+        try {
+            emailService.sendBanNotification(user.getEmail(), user.getName());
+        }
+        catch (Exception e) {
+            // Log the error or handle it as needed
+            System.err.println("Failed to send ban notification email: " + e.getMessage());
+        }
         return "User successfully banned!";
     }
 

@@ -59,11 +59,15 @@ export class ReplyService {
     // Admin methods
     adminDeleteReply(id: string): Observable<any> {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`);
-        return this.http.delete<any>(`${this.apiUrl}/admin/delete?id=${id}`, { headers });
+        return this.http.delete<any>(`${this.apiUrl}/delete?id=${id}`, { headers });
     }
 
     adminUpdateReply(reply: any): Observable<any> {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`);
-        return this.http.put<any>(`${this.apiUrl}/admin/update`, reply, { headers });
+        const updatedReply = {
+            id: reply.id,
+            body: reply.body
+        }
+        return this.http.put<any>(`${this.apiUrl}/update`, updatedReply, { headers });
     }
 } 

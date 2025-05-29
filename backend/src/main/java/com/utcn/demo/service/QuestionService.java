@@ -80,6 +80,7 @@ public class QuestionService {
                     .map(User::getId)
                     .collect(Collectors.toSet())
             );
+            questionDTO.setAuthor(question.get().getAuthor());
             return questionDTO;
         }
         return null;
@@ -142,7 +143,7 @@ public class QuestionService {
             User user = question.getAuthor();
 
             if (!user.getId().equals(userId) && !requestingUser.isAdmin()) {
-                return null;
+                throw new RuntimeException("You do not have permission to update this question.");
             }
 
             if (user.isBanned()) {

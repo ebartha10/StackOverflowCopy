@@ -103,11 +103,12 @@ public class QuestionController {
         if (userId == null) {
             return ResponseEntity.badRequest().body("Invalid authorization token.");
         }
-        QuestionDTO updatedQuestionDTO = questionService.updateQuestion(questionDTO, userId);
-        if (updatedQuestionDTO == null) {
-            return ResponseEntity.badRequest().body("Something went wrong.");
+        try{
+            QuestionDTO updatedQuestionDTO = questionService.updateQuestion(questionDTO, userId);
+            return ResponseEntity.ok(updatedQuestionDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Invalid question data.");
         }
-        return ResponseEntity.ok(updatedQuestionDTO);
     }
 
     @DeleteMapping("/delete")

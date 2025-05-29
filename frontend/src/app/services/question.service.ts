@@ -98,7 +98,12 @@ export class QuestionService {
 
     adminUpdateQuestion(question: Question): Observable<Question> {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`);
-        return this.http.put<any>(`${this.apiUrl}/update`, question, { headers })
+        const updatedQuestion = {
+            id: question.id,
+            authorId: question.authorId,
+            body: question.body
+        }
+        return this.http.put<any>(`${this.apiUrl}/update`, updatedQuestion, { headers })
             .pipe(map(question => this.mapQuestion(question)));
     }
 } 

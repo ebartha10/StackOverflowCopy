@@ -1,16 +1,14 @@
 package com.utcn.demo.service;
 
-import brevo.*;
-import brevo.auth.ApiKeyAuth;
-import brevoApi.AccountApi;
-import brevoApi.EmailCampaignsApi;
-import brevoModel.GetAccount;
-import com.mailersend.sdk.MailerSend;
-import com.mailersend.sdk.emails.Email;
-import com.mailersend.sdk.emails.Personalization;
+import com.sendgrid.*;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+import com.sendgrid.helpers.mail.objects.Personalization;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,31 +24,48 @@ public class EmailService {
     @Value("${MAILERSEND_FROM_EMAIL}")
     private String fromEmail;
 
-    @Value("${BREVO_API_KEY}")
-    private String brevoApiKey;
-    private final MailerSend mailerSend;
+    @Value("${SENDGRID_API_KEY}")
+    private String sendgridApiKey;
     private static final String BAN_TEMPLATE_ID = "351ndgwojr54zqx8";
 
     public EmailService() {
-        this.mailerSend = new MailerSend();
+
     }
 
     public void sendBanNotification(String userEmail, String userName) {
-        ApiClient defaultClient = Configuration.getDefaultApiClient();
+        Email from = new Email("emericbartha@gmail.com");
+        String subject = "You have been banned from StackOverflow Clone";
+        Email to = new Email(userEmail);
+        String templateId = "d-e67d5a773bf548169b94d9b7b46391fa"; // Replace with your template ID
 
-        // Configure API key authorization: api-key
-        ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("api-key");
-        apiKey.setApiKey(brevoApiKey);
-        // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
-        apiKey.setApiKeyPrefix("Token");
+        // Create a personalization object for dynamic data
+        Personalization personalization = new Personalization();
+        personalization.addTo(to);
+        Map<String, String> dynamicTemplateData = new HashMap<>();
+        dynamicTemplateData.put("date", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        dynamicTemplateData.put("user", userName);
+        personalization.addDynamicTemplateData("dynamic_template_data", dynamicTemplateData);
 
-        EmailCampaignsApi apiInstance = new EmailCampaignsApi();
-        Long campaignId = 789L; // Long | Id of the campaign
+        // Create the mail object
+        Mail mail = new Mail(from,  subject, to, new Content("text/plain", "You have been banned!"));
+        mail.setTemplateId(templateId);
+        mail.addPersonalization(personalization);
+        mail.setSubject(subject);
+
+
+
+        SendGrid sg = new SendGrid(sendgridApiKey);
+        Request request = new Request();
         try {
-            apiInstance.sendEmailCampaignNow(campaignId);
-        } catch (ApiException e) {
-            System.err.println("Exception when calling EmailCampaignsApi#sendEmailCampaignNow");
-            e.printStackTrace();
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            System.out.println(response.getStatusCode());
+            System.out.println(response.getBody());
+            System.out.println(response.getHeaders());
+        } catch (IOException ex) {
+            throw new RuntimeException("Error sending email", ex);
         }
 
     }

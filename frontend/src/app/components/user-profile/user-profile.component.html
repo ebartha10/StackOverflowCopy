@@ -38,8 +38,8 @@
                         [color]="user.isBanned ? 'red' : 'red'"
                         class="ban-button"
                         (click)="toggleBanStatus()">
-                    <mat-icon>{{user.isBanned ? 'lock_open' : 'block'}}</mat-icon>
-                    {{user.isBanned ? 'UNBAN USER' : 'BAN USER'}}
+                    <mat-icon>{{user.banned ? 'lock_open' : 'block'}}</mat-icon>
+                    {{user.banned ? 'UNBAN USER' : 'BAN USER'}}
                 </button>
             }
         </div>

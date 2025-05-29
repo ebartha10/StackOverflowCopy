@@ -40,7 +40,7 @@ export class AskQuestionComponent {
     
     allTags: string[] = [
         'javascript', 'angular', 'typescript', 'css', 'html', 
-        'react', 'node.js', 'python', 'java', 'c#',
+         'node.js', 'python', 'java', 'c#',
         'php', 'android', 'jquery', 'sql', 'mysql',
         'ios', 'reactjs', 'arrays', 'django', 'spring'
     ];
@@ -77,8 +77,16 @@ export class AskQuestionComponent {
 
     addTag(event: any) {
         const value = (event.value || '').trim();
-        if (value && this.selectedTags.length < 5 && !this.selectedTags.includes(value)) {
-            this.selectedTags.push(value);
+        if (value) {
+            // If the tag doesn't exist in allTags, add it
+            if (!this.allTags.includes(value)) {
+                this.allTags.push(value);
+            }
+            
+            // Add to selected tags if not already selected and under limit
+            if (this.selectedTags.length < 5 && !this.selectedTags.includes(value)) {
+                this.selectedTags.push(value);
+            }
         }
         event.chipInput!.clear();
         this.tagSearch = '';
@@ -134,5 +142,27 @@ export class AskQuestionComponent {
                 );
             }
         });
+    }
+
+    // Add new method to handle key press events
+    onTagInputKeyPress(event: Event) {
+        const keyboardEvent = event as KeyboardEvent;
+        if (keyboardEvent.key === 'Enter') {
+            keyboardEvent.preventDefault();
+            const value = this.tagSearch.trim();
+            if (value) {
+                // If the tag doesn't exist in allTags, add it
+                if (!this.allTags.includes(value)) {
+                    this.allTags.push(value);
+                }
+                
+                // Add to selected tags if not already selected and under limit
+                if (this.selectedTags.length < 5 && !this.selectedTags.includes(value)) {
+                    this.selectedTags.push(value);
+                }
+                this.tagSearch = '';
+                this.filteredTags = [];
+            }
+        }
     }
 } 

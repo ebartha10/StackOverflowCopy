@@ -193,28 +193,68 @@ export class QuestionThreadComponent implements OnInit {
     saveAnswerEdit(answerId: string) {
         const answer = this.answers.find(a => a.id === answerId);
         if (answer && this.editAnswerBody.trim()) {
-            answer.body = this.editAnswerBody;
+            const updatedAnswerData = {
+                ...answer,
+                body: this.editAnswerBody
+            };
+            
             if (this.isAdmin()) {
-                this.replyService.adminUpdateReply(answer).subscribe({
+                console.log('Sending admin update with data:', updatedAnswerData);
+                this.replyService.adminUpdateReply(updatedAnswerData).subscribe({
                     next: (updatedAnswer) => {
+                        console.log('Received updated answer:', updatedAnswer);
                         const index = this.answers.findIndex(a => a.id === answerId);
                         if (index !== -1) {
-                            this.answers[index] = updatedAnswer;
+                            // Ensure we have all required properties
+                            const mergedAnswer = {
+                                ...this.answers[index],
+                                ...updatedAnswer,
+                                body: updatedAnswer.body || this.editAnswerBody,
+                                id: answerId,
+                                questionId: this.answers[index].questionId,
+                                author: this.answers[index].author,
+                                voteCount: this.answers[index].voteCount,
+                                likedBy: this.answers[index].likedBy,
+                                dislikedBy: this.answers[index].dislikedBy
+                            };
+                            console.log('Merged answer data:', mergedAnswer);
+                            this.answers[index] = mergedAnswer;
+                            this.answers = [...this.answers]; // Force array update
                         }
                         this.editingAnswerId = null;
+                        this.editAnswerBody = '';
+                        this.cdr.detectChanges();
                     },
                     error: (error) => {
                         console.error('Error updating answer:', error);
                     }
                 });
             } else {
-                this.replyService.updateReply(answer).subscribe({
+                console.log('Sending regular update with data:', updatedAnswerData);
+                this.replyService.updateReply(updatedAnswerData).subscribe({
                     next: (updatedAnswer) => {
+                        console.log('Received updated answer:', updatedAnswer);
                         const index = this.answers.findIndex(a => a.id === answerId);
                         if (index !== -1) {
-                            this.answers[index] = updatedAnswer;
+                            // Ensure we have all required properties
+                            const mergedAnswer = {
+                                ...this.answers[index],
+                                ...updatedAnswer,
+                                body: updatedAnswer.body || this.editAnswerBody,
+                                id: answerId,
+                                questionId: this.answers[index].questionId,
+                                author: this.answers[index].author,
+                                voteCount: this.answers[index].voteCount,
+                                likedBy: this.answers[index].likedBy,
+                                dislikedBy: this.answers[index].dislikedBy
+                            };
+                            console.log('Merged answer data:', mergedAnswer);
+                            this.answers[index] = mergedAnswer;
+                            this.answers = [...this.answers]; // Force array update
                         }
                         this.editingAnswerId = null;
+                        this.editAnswerBody = '';
+                        this.cdr.detectChanges();
                     },
                     error: (error) => {
                         console.error('Error updating answer:', error);

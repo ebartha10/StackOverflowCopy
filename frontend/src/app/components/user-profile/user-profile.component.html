@@ -1,88 +1,104 @@
 <div class="profile-container">
-    <!-- Profile Header -->
-    <div class="profile-header">
-        <div class="profile-info">
-            <div class="profile-avatar">
-                <img src="https://www.gravatar.com/avatar/placeholder?d=identicon" alt="User avatar">
-                @if (user.isAdmin) {
-                    <div class="admin-badge">
-                        <mat-icon>verified</mat-icon>
-                        Admin
-                    </div>
-                }
-            </div>
-            <div class="profile-details">
-                <h1>{{user.username}}</h1>
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">{{user.reputation | number}}</div>
-                        <div class="stat-label">reputation</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">{{user.questionsCount}}</div>
-                        <div class="stat-label">questions</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">{{user.answersCount}}</div>
-                        <div class="stat-label">answers</div>
+    @if (isLoading) {
+        <div class="loading">Loading user profile...</div>
+    } @else {
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-info">
+                <div class="profile-avatar">
+                    <img src="https://www.gravatar.com/avatar/placeholder?d=identicon" alt="User avatar">
+                    @if (user.isAdmin) {
+                        <div class="admin-badge">
+                            <mat-icon>verified</mat-icon>
+                            Admin
+                        </div>
+                    }
+                </div>
+                <div class="profile-details">
+                    <h1>{{user.name}}</h1>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">{{user.score | number}}</div>
+                            <div class="stat-label">reputation</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{totalQuestions}}</div>
+                            <div class="stat-label">questions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{totalAnswers}}</div>
+                            <div class="stat-label">answers</div>
+                        </div>
                     </div>
                 </div>
             </div>
+            
+            @if (isAdmin && !user.isAdmin) {
+                <button mat-flat-button 
+                        [color]="user.isBanned ? 'red' : 'red'"
+                        class="ban-button"
+                        (click)="toggleBanStatus()">
+                    <mat-icon>{{user.isBanned ? 'lock_open' : 'block'}}</mat-icon>
+                    {{user.isBanned ? 'UNBAN USER' : 'BAN USER'}}
+                </button>
+            }
         </div>
-        
-        @if (isAdmin && !user.isAdmin) {
-            <button mat-flat-button 
-                    [color]="user.isBanned ? 'red' : 'red'"
-                    class="ban-button"
-                    (click)="toggleBanStatus()">
-                <mat-icon>{{user.isBanned ? 'lock_open' : 'block'}}</mat-icon>
-                {{user.isBanned ? 'UNBAN USER' : 'BAN USER'}}
-            </button>
-        }
-    </div>
 
-    <!-- Content Tabs -->
-    <mat-divider></mat-divider>
-    <mat-tab-group class="custom-tabs">
-        <mat-tab label="Questions">
-            <div class="tab-content">
-                @for (question of user.questions; track question.id) {
-                    <div class="activity-item">
-                        <div class="vote-count">
-                            <span>{{question.votes}}</span>
-                            votes
-                        </div>
-                        <div class="item-details">
-                            <a [routerLink]="['/questions', question.id]" class="item-title">
-                                {{question.title}}
-                            </a>
-                            <div class="item-meta">
-                                asked {{question.createdAt | date:'MMM d, y'}}
+        <!-- Content Tabs -->
+        <mat-divider></mat-divider>
+        <mat-tab-group class="custom-tabs">
+            <mat-tab label="Questions">
+                <div class="tab-content">
+                    @if (isLoadingQuestions) {
+                        <div class="loading">Loading questions...</div>
+                    } @else if (questions.length) {
+                        @for (question of questions; track question.id) {
+                            <div class="activity-item">
+                                <div class="vote-count">
+                                    <span>{{question.voteCount}}</span>
+                                    votes
+                                </div>
+                                <div class="item-details">
+                                    <a [routerLink]="['/questions', question.id]" class="item-title">
+                                        {{question.title}}
+                                    </a>
+                                    <div class="item-meta">
+                                        asked {{question.createdAt | date:'MMM d, y'}}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </mat-tab>
-        <mat-tab label="Answers">
-            <div class="tab-content">
-                @for (answer of user.answers; track answer.id) {
-                    <div class="activity-item">
-                        <div class="vote-count">
-                            <span>{{answer.votes}}</span>
-                            votes
-                        </div>
-                        <div class="item-details">
-                            <a [routerLink]="['/questions', answer.questionId]" class="item-title">
-                                {{answer.questionTitle}}
-                            </a>
-                            <div class="item-meta">
-                                answered {{answer.createdAt | date:'MMM d, y'}}
+                        }
+                    } @else {
+                        <div class="no-content">No questions yet</div>
+                    }
+                </div>
+            </mat-tab>
+            <mat-tab label="Answers">
+                <div class="tab-content">
+                    @if (isLoadingAnswers) {
+                        <div class="loading">Loading answers...</div>
+                    } @else if (answers.length) {
+                        @for (answer of answers; track answer.id) {
+                            <div class="activity-item">
+                                <div class="vote-count">
+                                    <span>{{answer.voteCount}}</span>
+                                    votes
+                                </div>
+                                <div class="item-details">
+                                    <a [routerLink]="['/questions', answer.questionId]" class="item-title">
+                                        {{answer.body}}
+                                    </a>
+                                    <div class="item-meta">
+                                        answered {{answer.createdAt | date:'MMM d, y'}}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </mat-tab>
-    </mat-tab-group>
+                        }
+                    } @else {
+                        <div class="no-content">No answers yet</div>
+                    }
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    }
 </div>

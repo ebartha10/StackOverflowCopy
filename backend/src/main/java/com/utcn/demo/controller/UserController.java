@@ -24,6 +24,24 @@ public class UserController {
         return null;
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable String id) {
+        UserDTO userDTO = userService.getUserById(id);
+        if (userDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(userDTO);
+    }
+
+    @GetMapping("/by-email")
+    public ResponseEntity<?> getUserByEmail(@RequestParam String email) {
+        UserDTO userDTO = userService.getUserByEmail(email);
+        if (userDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(userDTO);
+    }
+
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(
             @RequestHeader("Authorization") String authHeader,

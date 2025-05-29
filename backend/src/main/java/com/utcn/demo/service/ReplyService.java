@@ -33,7 +33,7 @@ public class ReplyService {
 
     public ReplyDTO createReply(ReplyDTO replyDTO) {
         Optional<User> optionalUser = userRepository.findById(replyDTO.getAuthor().getId());
-        Optional<Question> optionalQuestion = questionRepository.findById(replyDTO.getQuestionId().getId());
+        Optional<Question> optionalQuestion = questionRepository.findById(replyDTO.getQuestionId());
         
         if (optionalUser.isPresent() && optionalQuestion.isPresent()) {
             Reply reply = new Reply();
@@ -51,12 +51,12 @@ public class ReplyService {
                 createdReply.getId(),
                 createdReply.getBody(),
                 createdReply.getAuthor(),
-                createdReply.getQuestion(),
+                createdReply.getQuestion().getId(),
                 createdReply.getCreated_at(),
                 createdReply.getVoteCount(),
                 createdReply.isAccepted(),
-                createdReply.getLikedBy(),
-                createdReply.getDislikedBy()
+                createdReply.getLikedBy().stream().map(User::getId).collect(Collectors.toSet()),
+                createdReply.getDislikedBy().stream().map(User::getId).collect(Collectors.toSet())
             );
             return createdReplyDTO;
         }
@@ -71,12 +71,12 @@ public class ReplyService {
                 r.getId(),
                 r.getBody(),
                 r.getAuthor(),
-                r.getQuestion(),
+                r.getQuestion().getId(),
                 r.getCreated_at(),
                 r.getVoteCount(),
                 r.isAccepted(),
-                r.getLikedBy(),
-                r.getDislikedBy()
+                r.getLikedBy().stream().map(User::getId).collect(Collectors.toSet()),
+                r.getDislikedBy().stream().map(User::getId).collect(Collectors.toSet())
             );
         }
         return null;
@@ -93,13 +93,13 @@ public class ReplyService {
                     reply.getId(),
                     reply.getBody(),
                     reply.getAuthor(),
-                    reply.getQuestion(),
+                    reply.getQuestion().getId(),
                     reply.getCreated_at(),
                     reply.getVoteCount(),
                     reply.isAccepted(),
-                    reply.getLikedBy(),
-                    reply.getDislikedBy()
-                ))
+                    reply.getLikedBy().stream().map(User::getId).collect(Collectors.toSet()),
+                    reply.getDislikedBy().stream().map(User::getId).collect(Collectors.toSet())
+                )).sorted(Comparator.comparing(ReplyDTO::getVoteCount).reversed())
                 .collect(Collectors.toList());
         }
         return null;
@@ -111,8 +111,6 @@ public class ReplyService {
             Reply reply = optionalReply.get();
             reply.setBody(replyDTO.getBody());
             reply.setAccepted(replyDTO.isAccepted());
-            reply.setLikedBy(replyDTO.getLikedBy());
-            reply.setDislikedBy(replyDTO.getDislikedBy());
             reply.setVoteCount(replyDTO.getVoteCount());
 
             Reply updatedReply = replyRepository.save(reply);
@@ -120,13 +118,13 @@ public class ReplyService {
                 updatedReply.getId(),
                 updatedReply.getBody(),
                 updatedReply.getAuthor(),
-                updatedReply.getQuestion(),
+                updatedReply.getQuestion().getId(),
                 updatedReply.getCreated_at(),
                 updatedReply.getVoteCount(),
                 updatedReply.isAccepted(),
-                updatedReply.getLikedBy(),
-                updatedReply.getDislikedBy()
-            );
+                updatedReply.getLikedBy().stream().map(User::getId).collect(Collectors.toSet()),
+                    updatedReply.getDislikedBy().stream().map(User::getId).collect(Collectors.toSet())
+                    );
         }
         return null;
     }
@@ -151,6 +149,7 @@ public class ReplyService {
             }
             if (r.getDislikedBy().contains(user.get())) {
                 r.getDislikedBy().remove(user.get());
+                r.setVoteCount(r.getVoteCount() + 1);
             }
             r.getLikedBy().add(user.get());
             r.setVoteCount(r.getVoteCount() + 1);
@@ -175,6 +174,7 @@ public class ReplyService {
             }
             if (r.getLikedBy().contains(user.get())) {
                 r.getLikedBy().remove(user.get());
+                r.setVoteCount(r.getVoteCount() - 1);
             }
             r.getDislikedBy().add(user.get());
             r.setVoteCount(r.getVoteCount() - 1);
@@ -187,4 +187,31 @@ public class ReplyService {
         }
         return null;
     }
-} 
+
+    public List<ReplyDTO> getRepliesByUserId(String userId, int pageNumber) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            Pageable paging = PageRequest.of(pageNumber, SEARCH_RESULT_PER_PAGE);
+            Page<Reply> repliesPage = replyRepository.findAllByAuthorIdOrderByVoteCountDesc(user.get().getId(), paging);
+
+            return repliesPage.getContent().stream()
+                .map(reply -> new ReplyDTO(
+                    reply.getId(),
+                    reply.getBody(),
+                    reply.getAuthor(),
+                    reply.getQuestion().getId(),
+                    reply.getCreated_at(),
+                    reply.getVoteCount(),
+                    reply.isAccepted()
+                    , reply.getLikedBy().stream().map(User::getId).collect(Collectors.toSet()),
+                    reply.getDislikedBy().stream().map(User::getId).collect(Collectors.toSet())
+                ))
+                .collect(Collectors.toList());
+        }
+        return null;
+    }
+    public Integer getNumberOfRepliesForUser(String userId) {
+        Optional<User> user = userRepository.findById(userId);
+        return user.map(value -> replyRepository.countAllByAuthor(value)).orElse(0);
+    }
+}

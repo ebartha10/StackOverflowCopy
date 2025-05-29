@@ -6,18 +6,20 @@
             <div class="question-meta">
                 Asked <span>{{question.createdAt | date:'MMM d, y'}}</span>
                 Modified <span>{{question.updatedAt | date:'MMM d, y'}}</span>
-                Viewed <span>{{question.views}} times</span>
             </div>
         </div>
 
         <div class="post-layout">
             <div class="vote-cell">
-                <button mat-icon-button>
-                    <mat-icon>arrow_upward</mat-icon>
+                <button mat-icon-button (click)="upvoteQuestion()" *ngIf="authService.isAuthenticated()">
+                    <mat-icon [class.voted]="isQuestionLiked()">arrow_upward</mat-icon>
                 </button>
-                <div class="vote-count">{{question.votes}}</div>
-                <button mat-icon-button>
-                    <mat-icon>arrow_downward</mat-icon>
+                <div class="vote-count" [ngClass]="{
+                    'upvoted': isQuestionLiked(),
+                    'downvoted': isQuestionDisliked()
+                }">{{question.voteCount}}</div>
+                <button mat-icon-button (click)="downvoteQuestion()" *ngIf="authService.isAuthenticated()">
+                    <mat-icon [class.voted]="isQuestionDisliked()">arrow_downward</mat-icon>
                 </button>
             </div>
 
@@ -43,12 +45,25 @@
                 } @else {
                     <div class="content-with-edit">
                         <div class="post-body">{{question.body}}</div>
-                        <button mat-stroked-button
-                                class="edit-button"
-                                (click)="startQuestionEdit()">
-                            <mat-icon>edit</mat-icon>
-                            Edit
-                        </button>
+                        <div class="action-buttons">
+                            <div class="button-stack">
+                                <button mat-stroked-button
+                                        class="edit-button"
+                                        (click)="startQuestionEdit()"
+                                        *ngIf="isQuestionAuthor()">
+                                    <mat-icon>edit</mat-icon>
+                                    Edit
+                                </button>
+                                <button mat-stroked-button
+                                        color="warn"
+                                        class="delete-button"
+                                        (click)="deleteQuestion()"
+                                        *ngIf="isAdmin()">
+                                    <mat-icon>delete</mat-icon>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 }
 
@@ -60,10 +75,10 @@
                 <div class="post-author">
                     <div class="author-info">
                         asked by
-                        <a [routerLink]="['/users', question.author.id]">
-                            {{question.author.username}}
+                        <a [routerLink]="['/users', question.author?.id]">
+                            {{question.author?.name || 'Unknown User'}}
                         </a>
-                        <div class="reputation">{{question.author.reputation | number}}</div>
+                        <div class="reputation">{{question.author?.score | number}}</div>
                     </div>
                 </div>
             </div>
@@ -72,69 +87,111 @@
 
     <!-- Answers Section -->
     <div class="answers-section">
-        <h2>{{question.answers}} Answers</h2>
+        <h2>{{answers.length}} Answers</h2>
 
-        @for (answer of answers; track answer.id) {
-            <div class="answer-item">
-                <div class="post-layout">
-                    <div class="vote-cell">
-                        <button mat-icon-button>
-                            <mat-icon>arrow_upward</mat-icon>
-                        </button>
-                        <div class="vote-count">{{answer.votes}}</div>
-                        <button mat-icon-button>
-                            <mat-icon>arrow_downward</mat-icon>
-                        </button>
-                    </div>
+        @if (isLoading) {
+            <div class="loading">Loading answers...</div>
+        } @else {
+            @for (answer of answers; track answer.id) {
+                <div class="answer-item">
+                    <div class="post-layout">
+                        <div class="vote-cell">
+                            <button mat-icon-button (click)="upvoteReply(answer.id)" *ngIf="authService.isAuthenticated()">
+                                <mat-icon [class.voted]="isAnswerLiked(answer)">arrow_upward</mat-icon>
+                            </button>
+                            <div class="vote-count">{{answer.voteCount}}</div>
+                            <button mat-icon-button (click)="downvoteReply(answer.id)" *ngIf="authService.isAuthenticated()">
+                                <mat-icon [class.voted]="isAnswerDisliked(answer)">arrow_downward</mat-icon>
+                            </button>
+                        </div>
 
-                    <div class="post-content">
-                        <!-- Answer Body with Edit Mode -->
-                        @if (editingAnswerId === answer.id) {
-                            <mat-form-field appearance="outline" class="full-width">
-                                <textarea matInput
-                                         [(ngModel)]="editAnswerBody"
-                                         rows="10"></textarea>
-                            </mat-form-field>
-                            <div class="edit-actions">
-                                <button mat-stroked-button
-                                        color="primary"
-                                        (click)="saveAnswerEdit(answer.id)">
-                                    Save Edits
-                                </button>
-                                <button mat-stroked-button
-                                        (click)="cancelAnswerEdit()">
-                                    Cancel
-                                </button>
-                            </div>
-                        } @else {
-                            <div class="content-with-edit">
-                                <div class="post-body">{{answer.body}}</div>
-                                <button mat-stroked-button
-                                        class="edit-button"
-                                        (click)="startAnswerEdit(answer)">
-                                    <mat-icon>edit</mat-icon>
-                                    Edit
-                                </button>
-                            </div>
-                        }
-                        
-                        <div class="post-author">
-                            <div class="author-info">
-                                answered {{answer.createdAt | date:'MMM d, y'}}
-                                <a [routerLink]="['/users', answer.author.id]">
-                                    {{answer.author.username}}
-                                </a>
-                                <div class="reputation">{{answer.author.reputation | number}}</div>
+                        <div class="post-content">
+                            <!-- Answer Body with Edit Mode -->
+                            @if (editingAnswerId === answer.id) {
+                                <mat-form-field appearance="outline" class="full-width">
+                                    <textarea matInput
+                                             [(ngModel)]="editAnswerBody"
+                                             rows="10"></textarea>
+                                </mat-form-field>
+                                <div class="edit-actions">
+                                    <button mat-stroked-button
+                                            color="primary"
+                                            (click)="saveAnswerEdit(answer.id)">
+                                        Save Edits
+                                    </button>
+                                    <button mat-stroked-button
+                                            (click)="cancelAnswerEdit()">
+                                        Cancel
+                                    </button>
+                                </div>
+                            } @else {
+                                <div class="content-with-edit">
+                                    <div class="post-body">{{answer.body}}</div>
+                                    <div class="action-buttons">
+                                        <div class="button-stack">
+                                            <button mat-stroked-button
+                                                    class="edit-button"
+                                                    (click)="startAnswerEdit(answer)"
+                                                    *ngIf="isAnswerAuthor(answer)">
+                                                <mat-icon>edit</mat-icon>
+                                                Edit
+                                            </button>
+                                            <button mat-stroked-button
+                                                    color="warn"
+                                                    class="delete-button"
+                                                    (click)="deleteAnswer(answer.id)"
+                                                    *ngIf="isAdmin()">
+                                                <mat-icon>delete</mat-icon>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            
+                            <div class="post-author">
+                                <div class="author-info">
+                                    answered {{answer.created_at | date:'MMM d, y'}}
+                                    <a [routerLink]="['/users', answer.author.id]">
+                                        {{answer.author.name}}
+                                    </a>
+                                    <div class="reputation">{{answer.author.score | number}}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            }
+
+            <!-- Pagination Controls -->
+            <div class="pagination-controls">
+                <button mat-stroked-button 
+                        [disabled]="currentPage === 0"
+                        (click)="onPageChange(currentPage - 1)">
+                    <mat-icon>chevron_left</mat-icon>
+                    Previous
+                </button>
+                
+                @for (page of pages; track page) {
+                    <button mat-stroked-button
+                            [class.active]="currentPage === page"
+                            (click)="onPageChange(page)">
+                        {{page + 1}}
+                    </button>
+                }
+
+                <button mat-stroked-button 
+                        [disabled]="currentPage === totalPages - 1"
+                        (click)="onPageChange(currentPage + 1)">
+                    Next
+                    <mat-icon>chevron_right</mat-icon>
+                </button>
             </div>
         }
     </div>
 
     <!-- Answer Form -->
-    <div class="answer-form">
+    <div class="answer-form" *ngIf="authService.isAuthenticated()">
         <h2>Your Answer</h2>
         <mat-form-field appearance="outline" class="full-width" >
             <textarea matInput

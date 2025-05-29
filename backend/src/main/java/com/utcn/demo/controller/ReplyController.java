@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/replies")
@@ -41,6 +42,20 @@ public class ReplyController {
         return ResponseEntity.ok(replyDTOs);
     }
 
+    @RequestMapping("/get/by-user/{pageNumber}")
+    public ResponseEntity<?> getRepliesByUser(@RequestParam String userId, @PathVariable int pageNumber) {
+        List<ReplyDTO> replyDTOs = replyService.getRepliesByUserId(userId, pageNumber);
+        int totalReplies = replyService.getNumberOfRepliesForUser(userId);
+        if (replyDTOs == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(
+                Map.of(
+                        "totalReplies", totalReplies,
+                        "replies", replyDTOs
+                )
+        );
+    }
     @PutMapping("/update")
     public ResponseEntity<?> updateReply(@RequestBody ReplyDTO replyDTO) {
         ReplyDTO updatedReplyDTO = replyService.updateReply(replyDTO);

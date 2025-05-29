@@ -5,7 +5,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-auth',
@@ -25,6 +27,7 @@ import { RouterModule } from '@angular/router';
 export class AuthComponent {
     isSignUp = false;
     hidePassword = true;
+    isLoading = false;
 
     signInForm = {
         email: '',
@@ -32,19 +35,82 @@ export class AuthComponent {
     };
 
     signUpForm = {
-        name: '',
+        username: '',
         email: '',
         password: '',
         confirmPassword: ''
     };
 
+    constructor(
+        private authService: AuthService,
+        private router: Router,
+        private snackBar: MatSnackBar
+    ) {}
+
     onSignIn() {
-        console.log('Sign in:', this.signInForm);
-        // TODO: Implement sign in logic
+        if (!this.signInForm.email || !this.signInForm.password) {
+            this.showError('Please fill in all fields');
+            return;
+        }
+
+        this.isLoading = true;
+        this.authService.login(this.signInForm).subscribe({
+            next: () => {
+                this.router.navigate(['/']);
+                this.showSuccess('Successfully logged in');
+            },
+            error: (error: any) => {
+                this.showError(error.error || 'An error occurred during login');
+            },
+            complete: () => {
+                this.isLoading = false;
+            }
+        });
     }
 
     onSignUp() {
-        console.log('Sign up:', this.signUpForm);
-        // TODO: Implement sign up logic
+        if (!this.signUpForm.username || !this.signUpForm.email || !this.signUpForm.password || !this.signUpForm.confirmPassword) {
+            this.showError('Please fill in all fields');
+            return;
+        }
+
+        if (this.signUpForm.password !== this.signUpForm.confirmPassword) {
+            this.showError('Passwords do not match');
+            return;
+        }
+
+        this.isLoading = true;
+        const registerData = {
+            email: this.signUpForm.email,
+            password: this.signUpForm.password,
+            username: this.signUpForm.username
+        };
+
+        this.authService.register(registerData).subscribe({
+            next: () => {
+                this.router.navigate(['/']);
+                this.showSuccess('Successfully registered');
+            },
+            error: (error: any) => {
+                this.showError(error.error || 'An error occurred during registration');
+            },
+            complete: () => {
+                this.isLoading = false;
+            }
+        });
+    }
+
+    private showError(message: string) {
+        this.snackBar.open(message, 'Close', {
+            duration: 5000,
+            panelClass: ['error-snackbar']
+        });
+    }
+
+    private showSuccess(message: string) {
+        this.snackBar.open(message, 'Close', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+        });
     }
 }

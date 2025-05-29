@@ -19,10 +19,10 @@ public class ReplyDTO {
     private String id;
     private String body;
     private User author;
-    private Question questionId;
+    private String questionId;
     private String created_at;
     private Long voteCount = 0L;
     private boolean isAccepted = false;
-    private Set<User> likedBy;
-    private Set<User> dislikedBy;
+    private Set<String> likedBy;
+    private Set<String> dislikedBy;
 }

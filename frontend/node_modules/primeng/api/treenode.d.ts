@@ -76,7 +76,15 @@ export interface TreeNode<T = any> {
      */
     key?: string;
     /**
-     * Mandatory unique key of the node.
+     * Defines if the node is loading.
      */
     loading?: boolean;
+    /**
+     * Defines if the node is the last child.
+     */
+    lastChild?: boolean;
+    /**
+     * Index of the node relative to its level.
+     */
+    index?: number;
 }

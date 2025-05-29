@@ -40,8 +40,8 @@
         <!-- Sign Up Form -->
         <form *ngIf="isSignUp" class="auth-form" (ngSubmit)="onSignUp()">
             <mat-form-field appearance="outline">
-                <mat-label>Display Name</mat-label>
-                <input matInput [(ngModel)]="signUpForm.name" name="name" required>
+                <mat-label>Username</mat-label>
+                <input matInput [(ngModel)]="signUpForm.username" name="username" required>
             </mat-form-field>
 
             <mat-form-field appearance="outline">

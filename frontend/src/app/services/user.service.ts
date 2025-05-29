@@ -11,12 +11,32 @@ import { environment } from '../../environments/environment';
     providedIn: 'root'
 })
 export class UserService {
-    private apiUrl = `${environment.apiUrl}/users`;
+    private apiUrl = `${environment.apiUrl}/api/users`;
 
     constructor(private http: HttpClient) {}
 
-    getUserById(userId: string): Observable<User> {
-        return this.http.get<User>(`${this.apiUrl}/${userId}`);
+    getUserById(id: string): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/${id}`);
+    }
+
+    getUserByEmail(email: string): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/by-email?email=${email}`);
+    }
+
+    updateUser(userData: any): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/update`, userData);
+    }
+
+    deleteUser(id: string): Observable<any> {
+        return this.http.delete<any>(`${this.apiUrl}/delete?id=${id}`);
+    }
+
+    banUser(userId: string): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/ban/${userId}`, {});
+    }
+
+    unbanUser(userId: string): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/unban?userId=${userId}`, {});
     }
 
     getUserQuestions(userId: string): Observable<Question[]> {

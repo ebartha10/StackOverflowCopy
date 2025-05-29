@@ -1,16 +1,19 @@
 export interface Question {
-    id: number;
+    id: string;
+    authorId: string;
     title: string;
     body: string;
-    votes: number;
+    createdAt: Date;
+    tags: string[];
+    voteCount: number;
+    likedById: Set<string>;
+    dislikedById: Set<string>;
     answers: number;
     views: number;
-    tags: string[];
     author: {
-        id: number;
-        username: string;
-        reputation: number;
+        id: string;
+        name: string;
+        score: number;
     };
-    createdAt: Date;
     updatedAt: Date;
 } 

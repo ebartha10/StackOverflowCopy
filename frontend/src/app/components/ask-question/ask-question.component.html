@@ -94,7 +94,12 @@
                     type="submit" 
                     class="submit-button"
                     [disabled]="!isFormValid()">
-                Post your question
+                @if (isSubmitting) {
+                    <mat-spinner diameter="20"></mat-spinner>
+                    <span class="button-text">Posting...</span>
+                } @else {
+                    Post your question
+                }
             </button>
         </div>
     </form>

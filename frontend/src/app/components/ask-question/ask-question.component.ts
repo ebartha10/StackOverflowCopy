@@ -8,6 +8,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Router } from '@angular/router';
+import { QuestionService, QuestionDTO } from '../../services/question.service';
 
 @Component({
     selector: 'app-ask-question',
@@ -20,7 +24,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
         MatButtonModule,
         MatChipsModule,
         MatIconModule,
-        MatAutocompleteModule
+        MatAutocompleteModule,
+        MatProgressSpinnerModule
     ],
     templateUrl: './ask-question.component.html',
     styleUrls: ['./ask-question.component.scss']
@@ -31,6 +36,7 @@ export class AskQuestionComponent {
     selectedTags: string[] = [];
     tagSearch: string = '';
     readonly separatorKeysCodes = [ENTER, COMMA] as const;
+    isSubmitting: boolean = false;
     
     allTags: string[] = [
         'javascript', 'angular', 'typescript', 'css', 'html', 
@@ -39,6 +45,12 @@ export class AskQuestionComponent {
         'ios', 'reactjs', 'arrays', 'django', 'spring'
     ];
     filteredTags: string[] = [];
+
+    constructor(
+        private questionService: QuestionService,
+        private snackBar: MatSnackBar,
+        private router: Router
+    ) {}
 
     filterTags() {
         if (!this.tagSearch.trim()) {
@@ -83,17 +95,44 @@ export class AskQuestionComponent {
     isFormValid(): boolean {
         return this.questionTitle.trim().length > 0 &&
                this.questionBody.trim().length > 0 &&
-               this.selectedTags.length > 0;
+               this.selectedTags.length > 0 &&
+               !this.isSubmitting;
     }
 
     onSubmit() {
-        if (this.isFormValid()) {
-            console.log('Submitting question:', {
-                title: this.questionTitle,
-                body: this.questionBody,
-                tags: this.selectedTags
-            });
-            // TODO: Implement actual submission logic
+        if (!this.isFormValid()) {
+            return;
         }
+
+        this.isSubmitting = true;
+
+        const questionData: QuestionDTO = {
+            title: this.questionTitle,
+            body: this.questionBody,
+            tags: this.selectedTags
+        };
+
+        this.questionService.createQuestion(questionData).subscribe({
+            next: (response) => {
+                this.snackBar.open('Question posted successfully!', 'Close', {
+                    duration: 3000,
+                    horizontalPosition: 'center',
+                    verticalPosition: 'top'
+                });
+                this.router.navigate(['/questions', response.id]);
+            },
+            error: (error) => {
+                this.isSubmitting = false;
+                this.snackBar.open(
+                    error.error?.message || 'Failed to post question. Please try again.',
+                    'Close',
+                    {
+                        duration: 5000,
+                        horizontalPosition: 'center',
+                        verticalPosition: 'top'
+                    }
+                );
+            }
+        });
     }
 } 

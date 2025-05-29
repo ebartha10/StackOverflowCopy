@@ -35,7 +35,7 @@ export class AuthComponent {
     };
 
     signUpForm = {
-        name: '',
+        username: '',
         email: '',
         password: '',
         confirmPassword: ''
@@ -59,7 +59,7 @@ export class AuthComponent {
                 this.router.navigate(['/']);
                 this.showSuccess('Successfully logged in');
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.showError(error.error || 'An error occurred during login');
             },
             complete: () => {
@@ -69,7 +69,7 @@ export class AuthComponent {
     }
 
     onSignUp() {
-        if (!this.signUpForm.name || !this.signUpForm.email || !this.signUpForm.password || !this.signUpForm.confirmPassword) {
+        if (!this.signUpForm.username || !this.signUpForm.email || !this.signUpForm.password || !this.signUpForm.confirmPassword) {
             this.showError('Please fill in all fields');
             return;
         }
@@ -83,7 +83,7 @@ export class AuthComponent {
         const registerData = {
             email: this.signUpForm.email,
             password: this.signUpForm.password,
-            username: this.signUpForm.name
+            username: this.signUpForm.username
         };
 
         this.authService.register(registerData).subscribe({
@@ -91,7 +91,7 @@ export class AuthComponent {
                 this.router.navigate(['/']);
                 this.showSuccess('Successfully registered');
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.showError(error.error || 'An error occurred during registration');
             },
             complete: () => {

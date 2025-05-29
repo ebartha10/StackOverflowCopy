@@ -1,99 +1,104 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { Question } from '../models/question.interface';
+
+export interface QuestionDTO {
+    id?: string;
+    title: string;
+    body: string;
+    tags: string[];
+    authorId?: string;
+}
 
 @Injectable({
     providedIn: 'root'
 })
 export class QuestionService {
-    private mockQuestions: Question[] = [
-        {
-            id: 1,
-            title: 'How to center a div in CSS?',
-            body: 'I am trying to center a div horizontally and vertically in CSS. What is the best way to do this?',
-            votes: 1542,
-            answers: 23,
-            views: 15234,
-            tags: ['css', 'html', 'flexbox', 'centering'],
-            author: {
-                id: 1,
-                username: 'john_doe',
-                reputation: 1234
-            },
-            createdAt: new Date('2024-03-15'),
-            updatedAt: new Date('2024-03-15')
-        },
-        {
-            id: 2,
-            title: 'Understanding async/await in TypeScript',
-            body: 'Can someone explain how async/await works in TypeScript? I am having trouble understanding the concept.',
-            votes: 892,
-            answers: 15,
-            views: 8765,
-            tags: ['typescript', 'javascript', 'async-await', 'promises'],
-            author: {
-                id: 2,
-                username: 'jane_smith',
-                reputation: 5678
-            },
-            createdAt: new Date('2024-03-14'),
-            updatedAt: new Date('2024-03-14')
-        },
-        {
-            id: 3,
-            title: 'Angular: How to share data between components?',
-            body: 'What are the different ways to share data between components in Angular? Which method is best for what scenario?',
-            votes: 456,
-            answers: 8,
-            views: 4321,
-            tags: ['angular', 'typescript', 'components', 'data-sharing'],
-            author: {
-                id: 3,
-                username: 'angular_dev',
-                reputation: 3456
-            },
-            createdAt: new Date('2024-03-13'),
-            updatedAt: new Date('2024-03-13')
-        },
-        {
-            id: 4,
-            title: 'Best practices for REST API design',
-            body: 'What are the current best practices for designing RESTful APIs? Looking for naming conventions, status codes, etc.',
-            votes: 789,
-            answers: 12,
-            views: 6789,
-            tags: ['api', 'rest', 'web-development', 'best-practices'],
-            author: {
-                id: 4,
-                username: 'api_master',
-                reputation: 8901
-            },
-            createdAt: new Date('2024-03-12'),
-            updatedAt: new Date('2024-03-12')
-        },
-        {
-            id: 5,
-            title: 'Docker vs Kubernetes: When to use what?',
-            body: 'I am confused about when to use Docker alone and when to use Kubernetes. Can someone explain the use cases?',
-            votes: 234,
-            answers: 6,
-            views: 3456,
-            tags: ['docker', 'kubernetes', 'containerization', 'devops'],
-            author: {
-                id: 5,
-                username: 'devops_pro',
-                reputation: 6789
-            },
-            createdAt: new Date('2024-03-11'),
-            updatedAt: new Date('2024-03-11')
-        }
-    ];
+    private apiUrl = `${environment.apiUrl}/api/questions`;
 
-    getQuestions(): Observable<Question[]> {
-        return of(this.mockQuestions);
+    constructor(private http: HttpClient) {}
+
+    private mapQuestion(question: any): Question {
+        return {
+            ...question,
+            authorId: question.authorId,
+            answers: question.answers || 0,
+            views: question.views || 0,
+            author: {
+                id: question.author?.id || question.authorId,
+                name: question.author?.name || 'User',
+                score: question.author?.score || 0
+            },
+            updatedAt: question.updatedAt || question.createdAt,
+            voteCount: question.voteCount || 0,
+            likedById: new Set(question.likedById || []),
+            dislikedById: new Set(question.dislikedById || [])
+        };
     }
 
-    getQuestionById(id: number): Observable<Question | undefined> {
-        return of(this.mockQuestions.find(q => q.id === id));
+    getQuestions(pageNumber: number = 0): Observable<Question[]> {
+        return this.http.get<any[]>(`${environment.apiUrl}/api/questions/get/all/${pageNumber}`)
+            .pipe(map(questions => questions.map(q => this.mapQuestion(q))));
+    }
+
+    getQuestionById(id: string): Observable<Question> {
+        return this.http.get<any>(`${this.apiUrl}/get/${id}`)
+            .pipe(map(question => this.mapQuestion(question)));
+    }
+
+    getQuestionsByTag(tag: string, pageNumber: number = 0): Observable<Question[]> {
+        return this.http.get<any[]>(`${environment.apiUrl}/api/questions/get/by-tag/${pageNumber}?tag=${tag}`)
+            .pipe(map(questions => questions.map(q => this.mapQuestion(q))));
+    }
+
+    getQuestionsByAuthor(authorId: string, page: number): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/get/by-author/${page}?authorId=${authorId}`);
+    }
+
+    getQuestionsByTitle(title: string, pageNumber: number = 0): Observable<Question[]> {
+        return this.http.get<any[]>(`${environment.apiUrl}/api/questions/get/by-title/${pageNumber}?title=${title}`)
+            .pipe(map(questions => questions.map(q => this.mapQuestion(q))));
+    }
+
+    createQuestion(question: QuestionDTO): Observable<QuestionDTO> {
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`);
+        return this.http.post<QuestionDTO>(`${this.apiUrl}/create`, question, { headers });
+    }
+
+    updateQuestion(question: Question): Observable<Question> {
+        const updateData = {
+            id: question.id,
+            authorId: question.authorId,
+            body: question.body
+        };
+        return this.http.put<any>(`${this.apiUrl}/update`, updateData)
+            .pipe(map(question => this.mapQuestion(question)));
+    }
+
+    deleteQuestion(id: string): Observable<any> {
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`);
+        return this.http.delete<any>(`${this.apiUrl}/delete?id=${id}`, { headers });
+    }
+
+    upvoteQuestion(questionId: string, userId: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/upvote?questionId=${questionId}&userId=${userId}`, {}, { responseType: 'text' });
+    }
+
+    downvoteQuestion(questionId: string, userId: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/downvote?questionId=${questionId}&userId=${userId}`, {}, { responseType: 'text' });
+    }
+
+    // Admin methods
+    adminDeleteQuestion(id: string): Observable<any> {
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`);
+        return this.http.delete<any>(`${this.apiUrl}/delete?id=${id}`, { headers });
+    }
+
+    adminUpdateQuestion(question: Question): Observable<Question> {
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`);
+        return this.http.put<any>(`${this.apiUrl}/update`, question, { headers })
+            .pipe(map(question => this.mapQuestion(question)));
     }
 } 

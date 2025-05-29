@@ -65,31 +65,21 @@
                         <div class="meta">
                             asked {{question.createdAt | date:'MMM d, y'}} by
                             <a [routerLink]="['/users', question.author.id]">
-                                {{question.author.username}}
+                                {{question.author.name}}
                             </a>
-                            <span class="reputation">{{question.author.reputation | number}}</span>
+                            <span class="reputation">{{question.author.score | number}}</span>
                         </div>
                     </div>
                 </div>
                 <div class="stats">
                     <div class="stat-item">
                         <div class="stat-content">
-                            <mat-icon class="stat-icon">arrow_upward</mat-icon>
-                            <span class="font-bold">{{question.votes}}</span>
+                            <mat-icon class="stat-icon">thumb_up</mat-icon>
+                            <span class="font-bold">{{question.voteCount}}</span>
+                            <span>votes</span>
                         </div>
                     </div>
-                    <div class="stat-item" [class.answered]="question.answers > 0">
-                        <div class="stat-content">
-                            <mat-icon class="stat-icon">question_answer</mat-icon>
-                            <span class="font-bold">{{question.answers}}</span>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-content">
-                            <mat-icon class="stat-icon">visibility</mat-icon>
-                            <span class="font-bold">{{question.views}}</span>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         }

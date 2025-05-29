@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
@@ -11,7 +11,6 @@ import { Question } from '../../models/question.interface';
 import { QuestionService } from '../../services/question.service';
 
 @Component({
-    
     selector: 'app-questions-list',
     standalone: true,
     imports: [
@@ -34,14 +33,52 @@ export class QuestionsListComponent implements OnInit {
     filteredTags: string[] = this.allTags;
     selectedTags: string[] = [];
     filteredQuestions: Question[] = [];
+    currentPage: number = 0;
+    isLoading: boolean = false;
 
-    constructor(private questionService: QuestionService) {}
+    constructor(
+        private questionService: QuestionService,
+        private route: ActivatedRoute
+    ) {}
 
     ngOnInit() {
-        this.questionService.getQuestions().subscribe(questions => {
-            this.questions = questions;
-            this.filteredQuestions = questions;
+        this.route.queryParams.subscribe(params => {
+            if (params['search']) {
+                this.searchByTitle(params['search']);
+            } else {
+                this.loadQuestions();
+            }
+            if (params['page']) {
+                this.currentPage = parseInt(params['page']) - 1;
+            }
         });
+    }
+
+    loadQuestions() {
+        this.isLoading = true;
+        this.questionService.getQuestions(this.currentPage).subscribe({
+            next: (questions) => {
+                this.questions = questions;
+                this.filteredQuestions = questions;
+                this.isLoading = false;
+            },
+            error: (error) => {
+                console.error('Error loading questions:', error);
+                this.isLoading = false;
+            }
+        });
+    }
+
+    loadNextPage() {
+        this.currentPage++;
+        this.loadQuestions();
+    }
+
+    loadPreviousPage() {
+        if (this.currentPage > 0) {
+            this.currentPage--;
+            this.loadQuestions();
+        }
     }
 
     filterTags() {
@@ -62,13 +99,26 @@ export class QuestionsListComponent implements OnInit {
         } else {
             this.selectedTags.splice(index, 1);
         }
-        // TODO: Implement filtering questions by selected tags
-        this.filteredQuestions = this.questions.filter(question =>
-            question.tags.some(tag => this.selectedTags.includes(tag))
-        );
-        if (this.selectedTags.length === 0) {
-            this.filteredQuestions = this.questions;
+        
+        if (this.selectedTags.length > 0) {
+            // Load questions for the first selected tag
+            this.questionService.getQuestionsByTag(this.selectedTags[0], this.currentPage)
+                .subscribe(questions => {
+                    this.filteredQuestions = questions;
+                });
+        } else {
+            this.loadQuestions();
         }
+    }
 
+    searchByTitle(title: string) {
+        if (title.trim()) {
+            this.questionService.getQuestionsByTitle(title, this.currentPage)
+                .subscribe(questions => {
+                    this.filteredQuestions = questions;
+                });
+        } else {
+            this.loadQuestions();
+        }
     }
 }

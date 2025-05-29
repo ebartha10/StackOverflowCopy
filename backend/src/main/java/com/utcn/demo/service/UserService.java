@@ -87,6 +87,7 @@ public class UserService {
                 String jwtToken = jwtService.generateToken(extraClaims, userDetails);
                 return AuthenticationResponse.builder()
                         .token(jwtToken)
+                        .userId(user.getId())
                         .build();
             }
         } catch (Exception e) {

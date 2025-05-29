@@ -17,4 +17,5 @@ public interface QuestionRepository extends CrudRepository<Question, String> {
     Page<Question> findAllByTagsContainingOrderByCreatedAtDesc (String tag, Pageable paging);
     Page<Question> findAllByTitleContainingIgnoreCaseOrderByCreatedAtDesc(String title, Pageable pageable);
     void deleteById(String id);
+    int countAllByAuthor(User author);
 }

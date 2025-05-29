@@ -5,6 +5,36 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDividerModule } from '@angular/material/divider';
+import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
+import { QuestionService } from '../../services/question.service';
+import { ReplyService } from '../../services/reply.service';
+
+interface Question {
+    id: string;
+    title: string;
+    voteCount: number;
+    createdAt: Date;
+}
+
+interface Reply {
+    id: string;
+    body: string;
+    questionId: string;
+    questionTitle: string;
+    voteCount: number;
+    createdAt: Date;
+    author: {
+        id: string;
+    };
+}
+
+interface PaginatedResponse<T> {
+    totalQuestions?: number;
+    totalReplies?: number;
+    questions?: T[];
+    replies?: T[];
+}
 
 @Component({
     selector: 'app-user-profile',
@@ -21,59 +51,107 @@ import { MatDividerModule } from '@angular/material/divider';
     styleUrls: ['./user-profile.component.scss']
 })
 export class UserProfileComponent implements OnInit {
-    user = {
-        id: 1,
-        username: 'john_doe',
-        reputation: 12345,
-        questionsCount: 42,
-        answersCount: 156,
-        isBanned: false,
+    user: any = {
+        id: '',
+        email: '',
+        name: '',
+        score: 0,
         isAdmin: false,
-        questions: [
-            {
-                id: 1,
-                title: 'How to center a div in CSS?',
-                votes: 15,
-                createdAt: new Date('2024-03-15')
-            },
-            {
-                id: 2,
-                title: 'Understanding async/await in TypeScript',
-                votes: 8,
-                createdAt: new Date('2024-03-10')
-            }
-        ],
-        answers: [
-            {
-                id: 1,
-                questionId: 3,
-                questionTitle: 'Best practices for REST API design',
-                votes: 23,
-                createdAt: new Date('2024-03-12')
-            },
-            {
-                id: 2,
-                questionId: 4,
-                questionTitle: 'Angular: How to share data between components?',
-                votes: 12,
-                createdAt: new Date('2024-03-08')
-            }
-        ]
+        isBanned: false
     };
 
-    isAdmin = true;
-    currentUserId = 2;
+    questions: Question[] = [];
+    answers: Reply[] = [];
+    totalQuestions: number = 0;
+    totalAnswers: number = 0;
+    isAdmin = false;
+    currentUserId: string | null = null;
+    isLoading = true;
+    isLoadingQuestions = false;
+    isLoadingAnswers = false;
 
-    constructor(private route: ActivatedRoute) {}
+    constructor(
+        private route: ActivatedRoute,
+        private userService: UserService,
+        private authService: AuthService,
+        private questionService: QuestionService,
+        private replyService: ReplyService
+    ) {}
 
     ngOnInit() {
-        const userId = Number(this.route.snapshot.paramMap.get('id'));
-        // TODO: Load user data from a service
+        const userId = this.route.snapshot.paramMap.get('id');
+        if (userId) {
+            this.loadUserData(userId);
+            this.loadUserQuestions(userId);
+            this.loadUserAnswers(userId);
+        }
+        this.currentUserId = this.authService.getCurrentUser()?.id || null;
+        this.isAdmin = this.authService.getCurrentUser()?.admin || false;
+    }
+
+    loadUserData(userId: string) {
+        this.isLoading = true;
+        this.userService.getUserById(userId).subscribe({
+            next: (userData) => {
+                this.user = userData;
+                this.isLoading = false;
+            },
+            error: (error) => {
+                console.error('Error loading user data:', error);
+                this.isLoading = false;
+            }
+        });
+    }
+
+    loadUserQuestions(userId: string) {
+        this.isLoadingQuestions = true;
+        this.questionService.getQuestionsByAuthor(userId, 0).subscribe({
+            next: (response: PaginatedResponse<Question>) => {
+                this.questions = response.questions || [];
+                this.totalQuestions = response.totalQuestions || 0;
+                this.isLoadingQuestions = false;
+            },
+            error: (error) => {
+                console.error('Error loading user questions:', error);
+                this.isLoadingQuestions = false;
+            }
+        });
+    }
+
+    loadUserAnswers(userId: string) {
+        this.isLoadingAnswers = true;
+        this.replyService.getRepliesByUser(userId, 0).subscribe({
+            next: (response: PaginatedResponse<Reply>) => {
+                this.answers = response.replies || [];
+                this.totalAnswers = response.totalReplies || 0;
+                this.isLoadingAnswers = false;
+            },
+            error: (error) => {
+                console.error('Error loading user answers:', error);
+                this.isLoadingAnswers = false;
+            }
+        });
     }
 
     toggleBanStatus() {
-        this.user.isBanned = !this.user.isBanned;
-        // TODO: Implement actual ban/unban logic with backend
-        console.log(`User ${this.user.isBanned ? 'banned' : 'unbanned'}`);
+        if (this.user.isBanned) {
+            this.userService.unbanUser(this.user.id).subscribe({
+                next: (response) => {
+                    this.user.isBanned = false;
+                },
+                error: (error) => {
+                    console.error('Error unbanning user:', error);
+                }
+            });
+        } else {
+            this.userService.banUser(this.user.id).subscribe({
+                next: (response) => {
+                    this.user.isBanned = true;
+                },
+                error: (error) => {
+                    console.error('Error banning user:', error);
+                }
+            });
+        }
     }
 } 

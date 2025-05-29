@@ -12,22 +12,25 @@
             <div class="nav-search">
                 <div class="search-wrapper">
                     <mat-icon class="search-icon">search</mat-icon>
-                    <input type="text" placeholder="Search..." class="search-input"/>
+                    <input type="text" 
+                           placeholder="Search..." 
+                           class="search-input"
+                           [(ngModel)]="searchQuery"
+                           (keyup)="onSearch($event)"/>
                 </div>
             </div>
 
             <!-- Actions -->
             <div class="nav-actions">
-                <button type="button" mat-icon-button [matMenuTriggerFor]="authMenu" class="auth-button">
-                    <mat-icon class="centered-icon">person</mat-icon>
+                <button mat-icon-button [matMenuTriggerFor]="authMenu" class="auth-button">
+                    <mat-icon>person</mat-icon>
                 </button>
 
                 <!-- Auth Menu -->
-                <mat-menu #authMenu="matMenu" xPosition="before" class="auth-menu">
-                    <!-- Show these items when user is logged in -->
+                <mat-menu #authMenu="matMenu" class="auth-menu">
                     <div class="menu-content">
                         <ng-container *ngIf="isLoggedIn">
-                            <a mat-menu-item routerLink="/profile">
+                            <a mat-menu-item [routerLink]="['/users', currentUser?.id]">
                                 <mat-icon>account_circle</mat-icon>
                                 <span>Profile</span>
                             </a>
@@ -37,7 +40,6 @@
                             </button>
                         </ng-container>
 
-                        <!-- Show these items when user is not logged in -->
                         <ng-container *ngIf="!isLoggedIn">
                             <a mat-menu-item routerLink="/auth">
                                 <mat-icon>login</mat-icon>

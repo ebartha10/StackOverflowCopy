@@ -24,6 +24,7 @@ public class QuestionDTO {
     private String id;
     private String authorId;
     private String title;
+    private User author;
     private String body;
     private Date createdAt;
     private List<String> tags;

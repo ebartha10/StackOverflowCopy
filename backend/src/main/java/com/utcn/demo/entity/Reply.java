@@ -21,7 +21,7 @@ public class Reply {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String body;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User author;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

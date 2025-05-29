@@ -69,6 +69,17 @@ public class QuestionService {
             questionDTO.setTags(question.get().getTags());
             questionDTO.setAuthorId(question.get().getAuthor().getId());
             questionDTO.setVoteCount(question.get().getVoteCount());
+            questionDTO.setCreatedAt(question.get().getCreatedAt());
+            questionDTO.setLikedById(
+                question.get().getLikedBy().stream()
+                    .map(User::getId)
+                    .collect(Collectors.toSet())
+            );
+            questionDTO.setDislikedById(
+                question.get().getDislikedBy().stream()
+                    .map(User::getId)
+                    .collect(Collectors.toSet())
+            );
             return questionDTO;
         }
         return null;
@@ -93,6 +104,7 @@ public class QuestionService {
             questionDTO.setBody(question.getBody());
             questionDTO.setTags(question.getTags());
             questionDTO.setAuthorId(question.getAuthor().getId());
+            questionDTO.setAuthor(question.getAuthor());
             questionDTO.setVoteCount(question.getVoteCount());
             questionDTOList.add(questionDTO);
         }
@@ -117,23 +129,35 @@ public class QuestionService {
 
         return getQuestionDTOS(questionsPage);
     }
+    public int getNumberOfQuestionsForUser(String userId) {
+        Optional<User> user = userRepository.findById(userId);
+        return user.map(value -> questionRepository.countAllByAuthor(value)).orElse(0);
+    }
     public QuestionDTO updateQuestion(QuestionDTO questionDTO, String userId) {
         Optional<Question> optionalQuestion = questionRepository.findById(questionDTO.getId());
+        User requestingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
         if (optionalQuestion.isPresent()) {
             Question question = optionalQuestion.get();
             User user = question.getAuthor();
 
-            if (!user.getId().equals(userId)) {
+            if (!user.getId().equals(userId) && !requestingUser.isAdmin()) {
                 return null;
             }
 
             if (user.isBanned()) {
                 throw new UserBannedException("Your account has been banned. You cannot update questions.");
             }
+            if(questionDTO.getTitle() != null && !questionDTO.getTitle().isEmpty()){
+                question.setTitle(questionDTO.getTitle());
+            }
+            if(questionDTO.getBody() != null && !questionDTO.getBody().isEmpty()){
+                question.setBody(questionDTO.getBody());
 
-            question.setTitle(questionDTO.getTitle());
-            question.setBody(questionDTO.getBody());
-            question.setTags(questionDTO.getTags());
+            }
+            if(questionDTO.getTags() != null && !questionDTO.getTags().isEmpty()) {
+                question.setTags(questionDTO.getTags());
+            }
 
             // Initialize sets if they're null
             if (question.getLikedBy() == null) {
@@ -196,10 +220,12 @@ public class QuestionService {
     }
     public String deleteQuestion(String id, String userId) {
         Optional<Question> question = questionRepository.findById(id);
+        User requestingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
         if (question.isPresent()) {
             User user = question.get().getAuthor();
-            if (!user.getId().equals(userId)) {
-                return null;
+            if (!user.getId().equals(userId) && !requestingUser.isAdmin()) {
+                throw new RuntimeException("You do not have permission to delete this question.");
             }
             if (user.isBanned()) {
                 throw new UserBannedException("Your account has been banned. You cannot delete questions.");
@@ -211,7 +237,9 @@ public class QuestionService {
                 return null;
             }
         }
-        return null;
+        else{
+            throw new RuntimeException("Question not found with ID: " + id);
+        }
     }
 
     public String upvoteQuestion(String questionId, String userId) {
@@ -227,13 +255,17 @@ public class QuestionService {
             if (q.getLikedBy().contains(votingUser)) {
                 return "Question already upvoted!";
             }
-            q.getDislikedBy().remove(votingUser);
+            if (q.getDislikedBy().contains(user.get())) {
+                q.getDislikedBy().remove(user.get());
+                q.setVoteCount(q.getVoteCount() + 1);
+            }
             q.getLikedBy().add(votingUser);
             q.setVoteCount(q.getVoteCount() + 1);
             questionRepository.save(q);
 
             User author = q.getAuthor();
             author.setScore(author.getScore() + 2.5);
+            userRepository.save(author);
             return "Question upvoted!";
         }
         return null;
@@ -253,6 +285,7 @@ public class QuestionService {
             }
             if (q.getLikedBy().contains(votingUser)) {
                 q.getLikedBy().remove(votingUser);
+                q.setVoteCount(q.getVoteCount() - 1);
             }
             q.getDislikedBy().add(votingUser);
             q.setVoteCount(q.getVoteCount() - 1);
@@ -260,6 +293,7 @@ public class QuestionService {
 
             User author = q.getAuthor();
             author.setScore(author.getScore() - 1.5);
+            userRepository.save(author);
             return "Question downvoted!";
         }
         return null;
